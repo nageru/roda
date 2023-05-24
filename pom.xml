@@ -24,14 +24,14 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/roda</url>
+            <url>https://maven.pkg.github.com/nageru/roda</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/*</url>
+            <url>https://maven.pkg.github.com/nageru/*</url>
         </repository>
         <repository>
             <id>maven-restlet</id>
@@ -107,7 +107,7 @@
         <akka.version>2.7.0</akka.version>
         <apacheds.version>2.0.0.AM26</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons_ip2.version>2.3.0</commons_ip2.version>
+        <commons_ip2.version>2.4.0-SNAPSHOT</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>

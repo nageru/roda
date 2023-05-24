@@ -113,12 +113,12 @@
                         <artifactId>docker-maven-plugin</artifactId>
                         <configuration>
                             <forceTags>true</forceTags>
-                            <imageName>keeps/roda</imageName>
+                            <imageName>nageru/roda</imageName>
+                            <dockerDirectory>${project.basedir}/docker-files</dockerDirectory>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
                                 <imageTag>latest</imageTag>
                             </imageTags>
-                            <dockerDirectory>${project.basedir}/docker-files</dockerDirectory>
                             <resources>
                                 <resource>
                                     <targetPath>/ROOT</targetPath>
