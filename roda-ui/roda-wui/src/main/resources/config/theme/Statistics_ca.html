@@ -1,0 +1,523 @@
+<div id="statistics" class="static-page max-width">
+<h1>Estadístiques</h1>
+
+<p>Aquesta pàgina mostra un tauler d'estadístiques relacionades amb diversos
+aspectes del repositori. Les estadístiques estan organitzades per seccions, cadascuna
+d'aquests centrats en un aspecte particular del repositori, p. ex.
+qüestions relacionades amb metadades i dades, estadístiques sobre ingest i
+processos de preservació, xifres sobre usuaris i problemes d'autenticació,
+esdeveniments de preservació, gestió de riscos i notificacions.</p>
+
+<h2>Metadades</h2>
+
+<div class="row full_width">
+<div class="col_4 stat_col_card">
+<h4>Nombre d'entitats intel·lectuals</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
+					data-source-only-active="true" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribució dels nivells de descripció (10 principals)</h4>
+			<canvas id="stat-desc-levels" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
+				data-source-facets="level" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="stat-desc-levels"
+				data-view="download" data-view-filename="description-levels.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_6 chart_col_card">
+			<h4>Accions de moviment d'usuari (10 principals)</h4>
+			<canvas id="user-move-actions" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=moveAIPInHierarchy"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="user-move-actions"
+				data-view="download" data-view-filename="user-move-actions.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+		<div class="col_6 chart_col_card">
+			<h4>Creacions de metadades descriptives d'usuari (10 principals)</h4>
+			<canvas id="user-desc-creations" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=createDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="user-desc-creations"
+				data-view="download" data-view-filename="user-desc-creations.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_6 chart_col_card">
+			<h4>Actualitzacions de metadades descriptives de l'usuari (10 principals)</h4>
+			<canvas id="user-desc-updates" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=updateDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="user-desc-updates"
+				data-view="download" data-view-filename="user-desc-updates.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+		<div class="col_6 chart_col_card">
+			<h4>Supressió de metadades descriptives de l'usuari (10 principals)</h4>
+			<canvas id="user-desc-deletes" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=deleteAIPDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="user-desc-deletes"
+				data-view="download" data-view-filename="user-desc-deletes.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Dades</h2>
+
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de representacions</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribució dels tipus de representació</h4>
+			<canvas id="representation-types" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
+				data-source-facets="type" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar"></canvas>
+			<span class="statistic toolbarLink" data-ref="representation-types"
+				data-view="download" data-view-filename="representation-types.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de fitxers</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribució dels fitxers PRONOM (10 principals)</h4>
+			<canvas id="file-formats-pronom" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="formatPronom" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="file-formats-pronom"
+				data-view="download" data-view-filename="file-formats-pronom.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Distribució de formats de fitxer (10 principals)</h4>
+			<canvas id="file-formats-description" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="fileFormat" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink"
+				data-ref="file-formats-description" data-view="download"
+				data-view-filename="file-formats-description.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i></span>
+		</div>
+	</div>
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Distribució dels tipus MIME de fitxers (10 principals)</h4>
+			<canvas id="file-formats-mimetypes" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="formatMimetype" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="file-formats-mimetypes"
+				data-view="download" data-view-filename="file-formats-mimetypes.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+
+	<h2>Processos</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de processos d'actuació</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
+					data-source-filters="!pluginType=INGEST"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribució de l'estat del procés d'actuació</h4>
+			<canvas id="process-action-status" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="state" data-view="chart"
+				data-source-filters="!pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="process-action-status"
+				data-view="download" data-view-filename="process-action-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribució del tipus de procés d'acció</h4>
+			<canvas id="process-action-type" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="pluginType" data-view="chart"
+				data-source-filters="!pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="process-action-type"
+				data-view="download" data-view-filename="process-action-type.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de processos d'ingestió</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
+					data-source-filters="pluginType=INGEST"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribució de l'estat del procés</h4>
+			<canvas id="process-ingest-status" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="state" data-view="chart"
+				data-source-filters="pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="process-ingest-status"
+				data-view="download" data-view-filename="process-ingest-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Nombre d'avaluacions (10 principals)</h4>
+			<canvas id="appraisal" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=appraisal"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="10"></canvas>
+			<span class="statistic toolbarLink" data-ref="appraisal"
+				data-view="download" data-view-filename="appraisal.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre d'informes</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribució del connector d'informes (5 principals)</h4>
+			<canvas id="process-reports-plugin" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
+				data-source-facets="pluginName" data-view="chart"
+				data-source-filters="!plugin=org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-view-limit="5"></canvas>
+			<span class="statistic toolbarLink" data-ref="process-reports-plugin"
+				data-view="download" data-view-filename="process-reports-plugin.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 chart_col_card">
+			<h4>Distribució de l'estat del connector d'informe</h4>
+			<canvas id="process-reports-plugin-state" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
+				data-source-facets="pluginState" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink"
+				data-ref="process-reports-plugin-state" data-view="download"
+				data-view-filename="process-reports-plugin-state.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+
+		<div class="col_8 chart_col_card">
+			<h4>Usuaris que han iniciat més processos (5 principals)</h4>
+			<canvas id="process-users" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=createJob"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-view-limit="5"></canvas>
+			<span class="statistic toolbarLink" data-ref="process-users"
+				data-view="download" data-view-filename="process-users.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Usuaris</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre d'usuaris</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.user.RODAMember"
+					data-view="text" data-source-filters="isUser=true"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 stat_col_card">
+			<h4>Nombre d'autenticacions</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.log.LogEntry"
+					data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login, state=SUCCESS"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Inicis de sessió correctes vs fallits</h4>
+			<canvas id="logins-state" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
+				data-source-facets="state" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="logins-state"
+				data-view="download" data-view-filename="logins-state.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Recursos transferits</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de recursos transferits</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 stat_col_card">
+			<h4>Ingestions amb èxit</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
+					data-view="text" data-view-field="totalCount"
+					data-source-filters="ancestors=PROCESSED/SUCCESSFULLY_INGESTED"></span>
+			</div>
+		</div>
+		<div class="col_4 stat_col_card">
+			<h4>Ingestions fallides</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
+					data-view="text" data-view-field="totalCount"
+					data-source-filters="ancestors=PROCESSED/UNSUCCESSFULLY_INGESTED"></span>
+			</div>
+		</div>
+	</div>
+
+	<h2>Esdeveniments de conservació</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre d'actes de conservació</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Agents de conservació per tipus (5 principals)</h4>
+			<canvas id="preservation-agents-type" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
+				data-source-facets="eventType" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-limit="5"></canvas>
+			<span class="statistic toolbarLink"
+				data-ref="preservation-agents-type" data-view="download"
+				data-view-filename="preservation-agents-type.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+
+	</div>
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Esdeveniments de preservació per agent (5 principals)</h4>
+			<canvas id="preservation-event-agents" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
+				data-source-facets="linkingAgentIdentifier" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar"
+				data-label-function="agentLabel" data-view-limit="5"></canvas>
+			<script type="text/javascript">
+				function agentLabel(label) {
+					var agent = JSON.parse(label);
+					var valueArray = agent.value.split('@');
+					var updatedValue = valueArray[0].substring(valueArray[0]
+							.lastIndexOf(".") + 1);
+					updatedValue = updatedValue.substring(updatedValue
+							.lastIndexOf(":") + 1);
+
+					if (valueArray.length != 1) {
+						updatedValue += "@" + valueArray[1];
+					}
+
+					return updatedValue;
+				}
+			</script>
+			<span class="statistic toolbarLink"
+				data-ref="preservation-event-agents" data-view="download"
+				data-view-filename="preservation-event-agents.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Riscos</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de riscos</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.risks.IndexedRisk"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Riscos segons la gravetat de la mitigació</h4>
+			<canvas id="risk-severity" class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.IndexedRisk"
+				data-source-facets="currentSeverityLevel" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="risk-severity"
+				data-view="download" data-view-filename="risk-severity.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Incidències de risc</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre d'incidències de risc</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Incidència del risc per gravetat</h4>
+			<canvas id="risk-incidence-severity" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
+				data-source-facets="severity" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink"
+				data-ref="risk-incidence-severity" data-view="download"
+				data-view-filename="risk-incidence-severity.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Incidència del risc per estat</h4>
+			<canvas id="risk-incidence-status" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
+				data-source-facets="status" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink" data-ref="risk-incidence-status"
+				data-view="download" data-view-filename="risk-incidence-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+
+	<h2>Notificació</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Nombre de notificacions</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.notifications.Notification"
+					data-view="text" data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Notificacions reconegudes</h4>
+			<canvas id="notification-acknowledge" class="statistic"
+				data-source="index"
+				data-source-class="org.roda.core.data.v2.notifications.Notification"
+				data-source-facets="isAcknowledged" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+			<span class="statistic toolbarLink"
+				data-ref="notification-acknowledge" data-view="download"
+				data-view-filename="notification-acknowledge.csv"> <i
+				class="fa fa-download" aria-hidden="true"></i>
+			</span>
+		</div>
+	</div>
+</div>
