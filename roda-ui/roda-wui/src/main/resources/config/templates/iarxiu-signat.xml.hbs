@@ -1,0 +1,32 @@
+{{~field name="identificador" 		auto-generate="identificador" label="{\"en\": \"Identifier\",\"ca\": \"Identificador\"}" xpath="//*:field[@name='identificador']/string()"~}}
+{{~field name="identificador_document" 	label="{\"en\": \"Document Identifier\",\"ca\": \"Identificador document\"}" type="text" }}
+{{~field name="tipus_signatura" 	label="{\"en\": \"Signature Type\",\"ca\": \"Tipus signatura\"}" type="list" options="[\"Embolcallant (enveloping)\",\"Incrustada (enveloped)\",\"Incrustada PDF\",\"Independent (detached)\"]"}}
+{{~field name="format_signatura" 	label="{\"en\": \"Signature format\",\"ca\": \"Format signatura\"}" type="list" options="[\"CMS\",  \"CAdES-BES\",  \"CAdES-EPES\",  \"CAdES-T\",  \"CAdES-C\",  \"CAdES-X\",  \"CAdES-X-L\",  \"CAdES-A\",  \"XMLDsig\",  \"XAdES-BES\",  \"XAdES-EPES\",  \"XAdES-T\",  \"XAdES-C\",  \"XAdES-X\",  \"XAdES-X-L\",  \"XAdES-A\",  \"CSV\",  \"XAdES internally detached signature\",  \"XAdES enveloped signature\",  \"CAdES detached/explicit signature\",  \"CAdES attached/implicit signature\",  \"PAdES\",  \"Tiquet PSIS\"]"}}
+{{~field name="data_signatura" 	type="date" label="{\"en\": \"Signature Date\",\"ca\": \"Data Signatura\"}" auto-generate="now" xpath="//*:field[@name='data_signatura']/string()"~}}
+{{~field name="data_validacio" 	type="date" label="{\"en\": \"Validation Date\",\"ca\": \"Data validació\"}" auto-generate="now" xpath="//*:field[@name='data_validacio']/string()"~}}
+{{~field name="evidencia_validacio" 	label="{\"en\": \"Validation Evidence\",\"ca\": \"Evidencia validació\"}" type="text"}}
+{{~field name="nom_signatari" 	label="{\"en\": \"Signer Name\",\"ca\": \"Nom signatari\"}" type="text"}}
+{{~field name="identificador_signatari" 	label="{\"en\": \"Signer Id\",\"ca\": \"Identificador signatari\"}" type="text"}}
+{{~field name="organitzacio" 	label="{\"en\": \"Organization\",\"ca\": \"Organització\"}" type="text"}}
+{{~field name="unitat_organica" 	label="{\"en\": \"Organic Unit\",\"ca\": \"Unitat orgànica\"}" type="text"}}
+{{~field name="politica_signatura" 	label="{\"en\": \"Signature Policy\",\"ca\": \"Política Signatura\"}" type="text"}}
+{{~field name="tipus_contingut" 	label="{\"en\": \"Content type\",\"ca\": \"Tipus contingut\"}" type="list" options="[\"Binari\",\"XML\"]"}}
+{{~field name="nivell_classificacio_certificat" 	label="{\"en\": \"Security Level Certificate\",\"ca\": \"Nivell Classificació Certificat\"}" type="text"}}
+
+<?xml version="1.0" encoding="utf-8" ?>
+<metadata>
+	<field name="identificador">{{identificador}}</field>
+	<field name="identificador_document">{{identificador_document}}</field>
+	<field name="tipus_signatura">{{tipus_signatura}}</field>
+	<field name="format_signatura">{{format_signatura}}</field>
+	<field name="data_signatura">{{data_signatura}}</field>
+	<field name="data_validacio">{{data_validacio}}</field>
+	<field name="evidencia_validacio">{{evidencia_validacio}}</field>
+	<field name="nom_signatari">{{nom_signatari}}</field>
+	<field name="identificador_signatari">{{identificador_signatari}}</field>
+	<field name="organitzacio">{{organitzacio}}</field>
+	<field name="unitat_organica">{{unitat_organica}}</field>
+	<field name="politica_signatura">{{politica_signatura}}</field>
+	<field name="tipus_contingut">{{tipus_contingut}}</field>
+	<field name="nivell_classificacio_certificat">{{nivell_classificacio_certificat}}</field>
+</metadata>
