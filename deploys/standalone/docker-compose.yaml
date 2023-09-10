@@ -41,7 +41,7 @@ services:
     ports:
       - "8081:8080"
     environment:
-      - URL=http://localhost:8080/api/openapi.json
+      - URL=http://192.168.45.136:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
   roda:
@@ -49,6 +49,7 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
+      - "8009:8009"
     depends_on:
       - solr
       - clamd
