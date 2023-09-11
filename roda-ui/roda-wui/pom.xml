@@ -113,11 +113,10 @@
                         <artifactId>docker-maven-plugin</artifactId>
                         <configuration>
                             <forceTags>true</forceTags>
-                            <imageName>nageru/roda</imageName>
+			    <imageName>ghcr.io/nageru/roda</imageName>
                             <dockerDirectory>${project.basedir}/docker-files</dockerDirectory>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
                             </imageTags>
                             <resources>
                                 <resource>
