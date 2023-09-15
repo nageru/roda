@@ -1,75 +1,81 @@
 version: '3.3'
 services:
-  zoo:
+  zoo1:
+    container_name: zoo1
     image: docker.io/zookeeper:3.8
     restart: unless-stopped
+    ports:
+      - "2181:2181"
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
     volumes:
-      - zookeeper_data:/data
-      - zookeeper_datalog:/datalog
-  solr:
+      - zookeeper1_data:/data
+      - zookeeper1_datalog:/datalog
+  solr1:
     image: docker.io/solr:9
+    container_name: solr1
     restart: unless-stopped
     ports:
       - "8983:8983"
+    depends_on:
+      - zoo1
     environment:
       SOLR_HEAP: 2g
-      ZK_HOST: zoo:2181
+      ZK_HOST: zoo1:2181
     command: -c
     volumes:
-      - solr_data:/var/solr
-
-  clamd:
-    image: docker.io/clamav/clamav:stable
-    restart: unless-stopped
-    volumes:
-      - clam_data:/var/lib/clamav
-      - roda_data:/roda/data/
-  siegfried:
+      - solr1_data:/var/solr
+#  clamd:
+#    image: docker.io/clamav/clamav:stable
+#    restart: unless-stopped
+#    volumes:
+#      - clam_data:/var/lib/clamav
+#      - roda_data:/roda/data/
+  siegfried1:
     image: ghcr.io/keeps/siegfried:v1.10.0
     restart: unless-stopped
+    container_name: siegfried1
     environment:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: 5138
     volumes:
-      - siegfried_data:/root/siegfried/
-      - roda_data:/roda/data/
-  swagger:
-    image: docker.io/swaggerapi/swagger-ui:latest
-    restart: on-failure
-    ports:
-      - "8081:8080"
-    environment:
-      - URL=http://192.168.45.136:8080/api/openapi.json
-      - DOC_EXPANSION=none
-      - VALIDATOR_URL=none
-  roda:
+      - siegfried1_data:/root/siegfried/
+      - roda1_data:/roda/data/
+#        #swagger:
+#        #image: docker.io/swaggerapi/swagger-ui:latest
+        #restart: on-failure
+        #ports:
+        #- "8081:8080"
+        #environment:
+        #- URL=http://192.168.45.136:8080/api/openapi.json
+        #- DOC_EXPANSION=none
+        #- VALIDATOR_URL=none
+  roda1:
     image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
     restart: unless-stopped
+    container_name: roda1
     ports:
       - "8080:8080"
       - "8009:8009"
     depends_on:
-      - solr
-      - clamd
-      - siegfried
+      - solr1
+      - siegfried1
     volumes:
-      - roda_data:/roda/data/
+      - roda1_data:/roda/data/
     environment:
-      # Solr Cloud configuration
+       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
-      - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
+      - RODA_CORE_SOLR_CLOUD_URLS=zoo1:2181
       - SOLR_NUM_SHARDS=4
       - SOLR_REPLICATION_FACTOR=1
-      # Base plugin services configuration
-      - SIEGFRIED_SERVER_URL=http://siegfried:5138
+      ## Base plugin services configuration
+      - SIEGFRIED_SERVER_URL=http://siegfried1:5138
       - CLAMD_TCPADDR=clamd
       - CLAMD_TCPSOCKET=3310
 volumes:
-  zookeeper_data:
-  zookeeper_datalog:
-  solr_data:
+  zookeeper1_data:
+  zookeeper1_datalog:
+  solr1_data:
   clam_data:
-  siegfried_data:
-  roda_data:
+  siegfried1_data:
+  roda1_data:

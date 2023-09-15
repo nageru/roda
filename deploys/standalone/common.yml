@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  clamd:
+    container_name: clamd-common
+    image: docker.io/clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clam_data:/var/lib/clamav
+#      - roda1_data:/roda/data1/
+#      - roda2_data:/roda/data2/
+volumes:
+  clam_data:
+#  roda1_data:
+#  roda2_data:
