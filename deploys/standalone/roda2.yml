@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   zoo2:
-    container_name: zoo2
+    container_name: zoo-upc
     image: docker.io/zookeeper:3.8
     restart: unless-stopped
     ports:
@@ -12,7 +12,7 @@ services:
       - zookeeper2_data:/data
       - zookeeper2_datalog:/datalog
   solr2:
-    container_name: solr2
+    container_name: solr-upc
     image: docker.io/solr:9
     restart: unless-stopped
     ports:
@@ -27,7 +27,7 @@ services:
       - solr2_data:/var/solr
   roda2:
     image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
-    container_name: roda2
+    container_name: roda-upc
     restart: unless-stopped
     ports:
       - "8082:8080"
@@ -49,7 +49,7 @@ services:
   siegfried2:
     image: ghcr.io/keeps/siegfried:v1.10.0
     restart: unless-stopped
-    container_name: siegfried2
+    container_name: siegfried-upc
     environment:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: 5138

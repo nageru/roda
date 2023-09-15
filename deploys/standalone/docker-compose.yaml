@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   zoo1:
-    container_name: zoo1
+    container_name: zoo-udl
     image: docker.io/zookeeper:3.8
     restart: unless-stopped
     ports:
@@ -13,7 +13,7 @@ services:
       - zookeeper1_datalog:/datalog
   solr1:
     image: docker.io/solr:9
-    container_name: solr1
+    container_name: solr-udl
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -21,7 +21,7 @@ services:
       - zoo1
     environment:
       SOLR_HEAP: 2g
-      ZK_HOST: zoo1:2181
+      ZK_HOST: zoo-udl:2181
     command: -c
     volumes:
       - solr1_data:/var/solr
@@ -34,7 +34,7 @@ services:
   siegfried1:
     image: ghcr.io/keeps/siegfried:v1.10.0
     restart: unless-stopped
-    container_name: siegfried1
+    container_name: siegfried-udl
     environment:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: 5138
@@ -53,7 +53,7 @@ services:
   roda1:
     image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
     restart: unless-stopped
-    container_name: roda1
+    container_name: roda-udl
     ports:
       - "8080:8080"
       - "8009:8009"
