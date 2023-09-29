@@ -17,6 +17,8 @@ RUN set -ex; \
 # Install web application
 COPY /ROOT /usr/local/tomcat/webapps/ROOT
 
+COPY server.xml /usr/local/tomcat/conf
+
 # Fix configuration & do some final cleanup
 RUN set -ex; \
     unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
