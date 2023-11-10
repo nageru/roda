@@ -20,19 +20,27 @@
         <name>KEEP SOLUTIONS</name>
         <url>https://www.keep.pt</url>
     </organization>
-    <distributionManagement>
+    <!--<distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/nageru/roda</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement>-->
     <repositories>
         <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <!--<repository>
             <id>github</id>
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/nageru/*</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
