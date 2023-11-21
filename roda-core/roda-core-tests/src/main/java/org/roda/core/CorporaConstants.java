@@ -144,6 +144,7 @@ public final class CorporaConstants {
   public static final String EARK_SIP_204_UPDATE = "eark_sip_2.0.4_update.zip";
   public static final String EARK_SIP_UPDATE_USER = "admin";
   public static final String BAGIT_SIP = "bagit.zip";
+  public static final String I_ARXIU_SIP = "bagit.zip"; // currently using the commons-ip BagIt as the IArxiu TODO "cesca_earxiu1.zip";
   public static final String TRANSFERRED_RESOURCE = "transferredresource";
   public static final String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
 
