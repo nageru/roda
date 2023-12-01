@@ -126,6 +126,7 @@
                port="8009"
                redirectPort="8443"
                maxParameterCount="1000"
+	       secretRequired="false"
                />
     
 
