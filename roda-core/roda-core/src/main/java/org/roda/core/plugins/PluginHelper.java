@@ -909,7 +909,7 @@ public final class PluginHelper {
     if (lites.isEmpty()) {
       return;
     }
-    LOGGER.debug("Acquiring lock for: {} request: {}", lites, requestUuid);
+    LOGGER.info("Acquiring lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), true,
       requestUuid);
   }

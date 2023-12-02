@@ -9,14 +9,14 @@ package org.roda.core.plugins.base.ingest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -27,10 +27,12 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.model.impl.bagit.BagitSIP;
+import org.roda_project.commons_ip.model.impl.iarxiu.IArxiuSIP;
+import org.roda_project.commons_ip.utils.IPEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -109,16 +111,37 @@ public class IArxiuToAIPPlugin extends SIPToAIPPlugin {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
     Path iArxiuPath = Paths.get(FilenameUtils.normalize(transferredResource.getFullPath()));
 
+    SIP iArxiuSIP = null;
     try {
       LOGGER.debug("Converting {} to AIP", iArxiuPath);
-      final SIP iArxiu = BagitSIP.parse(iArxiuPath);
+      iArxiuSIP = IArxiuSIP.parse(iArxiuPath);
+      final String iArxiuSIPID = iArxiuSIP.getId();
 
-      Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, iArxiu.getAncestors(),
-        computedSearchScope, forceSearchScope, job.getId());
+      reportItem.setSourceObjectOriginalIds(iArxiuSIP.getIds()); // ... eARK SIP to AIP plugin
 
-      AIP aipCreated = IArxiuToAIPPluginUtils.iArxiuToAip(iArxiu, model, METADATA_FILE,
+      final IPEnums.IPStatus status = IPEnums.IPStatus.NEW;
+      if (iArxiuSIP.getStatus() != status) {
+        LOGGER.warn("iArxiu SIP allows only the new status for the AIP; received status '{}' for: {}", iArxiuSIP.getStatus(), iArxiuSIP);
+      }
+
+      final String computedParentId = PluginHelper.getComputedParent(model, index, iArxiuSIP.getAncestors(),
+              computedSearchScope, forceSearchScope, job.getId()).orElse(null);
+
+      final AIP aipCreated = processNewSIP(index, model, reportItem, iArxiuSIP, computedParentId, transferredResource.getUUID());
+      final String aipCreatedId = aipCreated.getId();
+      final String aipCreatedParentId = aipCreated.getParentId();
+      LOGGER.info("Created new AIP with ID '{}' and parent ID from SIP ID '{}' SIP computed parent ID '{}'",
+              aipCreatedId, aipCreatedParentId, iArxiuSIPID, computedParentId);
+
+      /* Bagit To AIP Plugin AIP creation sample: generated the AIP from the Descriptive Metadata File
+            final AIP aipCreatedFromMetadata = IArxiuToAIPPluginUtils.iArxiuToAipFromGenerateDescriptiveMetadataFile(iArxiuSIP, model, "DC.xml", // ¿DC? for the eARK SIP // BagIt uses: METADATA_FILE,
         Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername(),
         PermissionUtils.getIngestPermissions(job.getUsername()), transferredResource.getUUID());
+       */
+
+      /* from eARK plugin an object lock is acquired... TODO PluginHelper.acquireObjectLock(aip, this);
+       * ... but from Bagit pluggin there is no lock used */
+      LOGGER.info("Skipping use of lite IsRODAObject lock for AIP with ID '{}'", aipCreatedId);
 
       PluginHelper.createSubmission(model, createSubmission, iArxiuPath, aipCreated.getId());
 
@@ -126,19 +149,34 @@ public class IArxiuToAIPPlugin extends SIPToAIPPlugin {
       reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aipCreated.getId())
         .setPluginState(PluginState.SUCCESS);
 
-      if (aipCreated.getParentId() == null && computedParentId.isPresent()) {
-        reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));
+      if (aipCreated.getParentId() == null && isNotBlank(computedParentId)) {
+        reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId));
       }
 
       createWellformedEventSuccess(model, index, transferredResource, aipCreated, job);
-      LOGGER.debug("Done with converting {} to AIP {}", iArxiuPath, aipCreated.getId());
-    } catch (RODAException | RuntimeException | ParseException e) {
+      LOGGER.info("Done with converting iArxiuSIP {} to AIP {}", iArxiuPath, aipCreated.getId());
+    } catch (RODAException | RuntimeException | ParseException | IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error converting " + iArxiuPath + " to AIP", e);
+    } finally { /* from eARK transform Transferred Resource Into An AIP TODO refactor for a commonToAIPPlugin
+    if (iArxiuSIP != null) {
+      Path transferredResourcesAbsolutePath = RodaCoreFactory.getTransferredResourcesScanner().getBasePath()
+              .toAbsolutePath();
+      if (!iArxiuSIP.getBasePath().toAbsolutePath().toString().startsWith(transferredResourcesAbsolutePath.toString())) {
+        FSUtils.deletePathQuietly(iArxiuSIP.getBasePath());
+      } */
     }
-
     report.addReport(reportItem);
     PluginHelper.createJobReport(this, model, reportItem, job);
+  }
+
+  private AIP processNewSIP(IndexService index, ModelService model, Report reportItem, SIP sip,
+                            String computedParentId, String ingestSIPUUID)
+          throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
+          AlreadyExistsException, ValidationException, IOException, LockingException {
+    String jobUsername = PluginHelper.getJobUsername(this, index);
+    return IArxiuToAIPPluginUtils.iArxiuSIPToAIP(sip, jobUsername, PermissionUtils.getIngestPermissions(jobUsername),
+            model, sip.getIds(), reportItem.getJobId(), computedParentId, ingestSIPUUID, this);
   }
 
   @Override

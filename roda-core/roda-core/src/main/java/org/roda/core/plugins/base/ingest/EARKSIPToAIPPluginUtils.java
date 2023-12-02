@@ -134,7 +134,7 @@ public class EARKSIPToAIPPluginUtils {
     return model.updateAIP(aip, username);
   }
 
-  private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)
+  protected static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException, ValidationException {
     // process descriptive metadata
@@ -217,7 +217,11 @@ public class EARKSIPToAIPPluginUtils {
       ContentPayload payload = new FSPathContentPayload(doc.getPath());
       try {
         model.createDocumentation(aipId, representationId, directoryPath, fileId, payload);
-      } catch (AlreadyExistsException e) {
+        /* TODO for iArxiu SIP documentation fails on: NoSuchFileException '/documentation/../BIN_1/index.xml'
+          /var/folders/jj/5r4m2qkx0sz6qv89cblrnkkm0000gn/T/_IArxiuToAIPPluginTest8353180541796317950/data/storage/aip/75d1ece9-64a4-48f4-8e87-d4fd40ce7f8c/documentation/../BIN_1/index.xml
+        */
+      }
+      catch (AlreadyExistsException e) {
         // Tolerate duplicate documentation when updating
         if (!update)
           throw e;
@@ -305,7 +309,7 @@ public class EARKSIPToAIPPluginUtils {
     processSchemas(model, sr.getSchemas(), aipId, representation.getId(), false);
   }
 
-  private static String getType(SIP sip) {
+  protected static String getType(SIP sip) {
     return sip.getContentType().asString();
   }
 
