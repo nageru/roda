@@ -40,8 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class IArxiuToAIPPlugin extends SIPToAIPPlugin {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(IArxiuToAIPPlugin.class);
+
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in BagIt format.";
   private static final String METADATA_FILE = "metadata.xml";
 
