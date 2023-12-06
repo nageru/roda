@@ -132,18 +132,25 @@ public class IArxiuToAIPPluginTest {
   public void testIngestIArxiuSIP() throws Exception {
     final AIP aip = ingestCorpora(); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
 
-    AssertJUnit.assertNotNull(aip.getRepresentations());
-
-    final String foundFileId = "_NOT_YET_"; // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
-    final CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-            foundFileId, true);
+    final List<Representation> representations = aip.getRepresentations();
+    AssertJUnit.assertNotNull(representations);
+    AssertJUnit.assertNotSame(0, representations.size());
 
     final List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
-      .map(OptionalWithCause::get).collect(Collectors.toList()));
+    for (Representation representation: representations) {
+      AssertJUnit.assertNotNull(representation);
+
+      final String foundFileId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
+      AssertJUnit.assertNotNull(foundFileId);
+      final CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+              foundFileId, true);
+
+      Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+              .map(OptionalWithCause::get).collect(Collectors.toList()));
+    }
 
     // All folders and files...
-    AssertJUnit.assertEquals( 0, // CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT,  TODO currently foundFileId = "_NOT_YET_"; id to find from SIP documentation BIN_1/index.xml
+    AssertJUnit.assertNotSame( 0, // the FOLDERS_COUNT + the FILES_COUNT: from SIP representation data: BIN_1/index.xml
             reusableAllFiles.size());
   }
 

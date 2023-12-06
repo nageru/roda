@@ -247,8 +247,8 @@ public class EARKSIPToAIPPluginUtils {
     }
   }
 
-  private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    boolean notify, boolean update, String username, Report reportItem) throws RequestNotValidException,
+  public static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
+                                                        boolean notify, boolean update, String username, Report reportItem) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     String representationType = getType(sr);
     boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());

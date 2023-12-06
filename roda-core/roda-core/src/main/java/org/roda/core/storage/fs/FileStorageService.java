@@ -389,8 +389,10 @@ public class FileStorageService implements StorageService {
            * should be:
            *  - "/var/folders/jj/5r4m2qkx0sz6qv89cblrnkkm0000gn/T/_IArxiuToAIPPluginTest13425388041462759068/data/storage/aip/2bbcdc62-a8b1-4245-b8bc-815fb19c85c1/BIN_1/index.xml"
            */
-          final Path pathFix = Path.of(binPath.toString() // TODO ugly fix to solve issue with the '..'
-                  .replaceAll("documentation/..", ""));
+          final Path pathFix = Path.of(binPath.toString()
+                  // TODO ugly fix to solve issue with the '..'
+                  .replaceAll("documentation/\\.\\.", "")
+                  .replaceAll("data/\\.\\.", ""));
           payload.writeToPath(pathFix);
           ContentPayload newPayload = new FSPathContentPayload(pathFix);
           Long sizeInBytes = Files.size(pathFix);
