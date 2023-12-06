@@ -383,19 +383,12 @@ public class FileStorageService implements StorageService {
             Files.createDirectories(parent);
           }
 
-          /* writing file...
-           * for payload path uses '..' not always supported:
-           *  - /var/folders/jj/5r4m2qkx0sz6qv89cblrnkkm0000gn/T/_IArxiuToAIPPluginTest13425388041462759068/data/storage/aip/2bbcdc62-a8b1-4245-b8bc-815fb19c85c1/documentation/../BIN_1/index.xml
-           * should be:
+          /* sample file:
            *  - "/var/folders/jj/5r4m2qkx0sz6qv89cblrnkkm0000gn/T/_IArxiuToAIPPluginTest13425388041462759068/data/storage/aip/2bbcdc62-a8b1-4245-b8bc-815fb19c85c1/BIN_1/index.xml"
            */
-          final Path pathFix = Path.of(binPath.toString()
-                  // TODO ugly fix to solve issue with the '..'
-                  .replaceAll("documentation/\\.\\.", "")
-                  .replaceAll("data/\\.\\.", ""));
-          payload.writeToPath(pathFix);
-          ContentPayload newPayload = new FSPathContentPayload(pathFix);
-          Long sizeInBytes = Files.size(pathFix);
+          payload.writeToPath(binPath);
+          ContentPayload newPayload = new FSPathContentPayload(binPath);
+          Long sizeInBytes = Files.size(binPath);
           boolean isReference = false;
           Map<String, String> contentDigest = null;
 
