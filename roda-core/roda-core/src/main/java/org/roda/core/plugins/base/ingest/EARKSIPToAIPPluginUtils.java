@@ -157,7 +157,8 @@ public class EARKSIPToAIPPluginUtils {
     List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
-      String descriptiveMetadataId = dm.getMetadata().getFileName();
+      final String descriptiveMetadataId = StringUtils.isNotBlank(dm.getId()) ? dm.getId() :
+              dm.getMetadata().getFileName();
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
       String metadataType = getMetadataType(dm);
       String metadataVersion = dm.getMetadataVersion();
