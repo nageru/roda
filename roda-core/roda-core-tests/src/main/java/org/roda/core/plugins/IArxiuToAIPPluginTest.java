@@ -20,6 +20,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
@@ -140,18 +141,44 @@ public class IArxiuToAIPPluginTest {
     for (Representation representation: representations) {
       AssertJUnit.assertNotNull(representation);
 
-      final String foundFileId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
-      AssertJUnit.assertNotNull(foundFileId);
-      final CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-              foundFileId, true);
+      final String foundBinaryFileId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
+      AssertJUnit.assertNotNull(foundBinaryFileId);
+      final List<File> representationBinaryFiles = getAllFiles(aip.getId(), foundBinaryFileId);
+      AssertJUnit.assertNotSame(0, representationBinaryFiles.size());
+      reusableAllFiles.addAll(representationBinaryFiles);
 
-      Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
-              .map(OptionalWithCause::get).collect(Collectors.toList()));
+      final List<DescriptiveMetadata> descriptiveMetadataList = representation.getDescriptiveMetadata(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
+      AssertJUnit.assertNotNull(descriptiveMetadataList);
+      AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
+
+      for (DescriptiveMetadata descriptiveMetadata: descriptiveMetadataList){
+        final String foundMetadataFile = descriptiveMetadata.getId();
+        final List<File> representationDescriptiveMetadataFiles = getAllFiles(aip.getId(), foundMetadataFile);
+        AssertJUnit.assertNotNull(foundMetadataFile);
+        // descriptiveMetadata.getId() is not found; TODO AssertJUnit.assertNotSame(0, representationDescriptiveMetadataFiles.size());
+        reusableAllFiles.addAll(representationDescriptiveMetadataFiles);
+      }
     }
 
     // All folders and files...
     AssertJUnit.assertNotSame( 0, // the FOLDERS_COUNT + the FILES_COUNT: from SIP representation data: BIN_1/index.xml
             reusableAllFiles.size());
+    // ...exists
+    AssertJUnit.assertTrue(reusableAllFiles.stream().allMatch(file -> file != null));
   }
+
+  private List<File> getAllFiles(String aipId, String fileId) throws Exception {
+
+    final CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId,
+            fileId, true);
+
+    final List<File> foundFiles = new ArrayList<>();
+    Iterables.addAll(foundFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+            .map(OptionalWithCause::get).collect(Collectors.toList()));
+
+    return foundFiles;
+  }
+
+
 
 }
