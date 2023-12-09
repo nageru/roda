@@ -64,8 +64,13 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+/** Ingest corpora test file & SiegFried corpora test file
+ * execute the:
+ *  - ingestCorporaTest for Premis presentations Plugin test
+ *  - siegfriedCorporaTestRepresentation for the tranfer resource test of representations */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class PluginReportContentTest {
+
 
   private static Path basePath;
   private static ModelService model;
@@ -162,9 +167,10 @@ public class PluginReportContentTest {
     return index.retrieve(TransferredResource.class, IdUtils.createUUID("test"), new ArrayList<>());
   }
 
+  /** test the ingest process with the MinimalIngest Plugin
+   * @throws Exception  */
   @Test
-  public void ingestCorporaTest() throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  public void ingestCorporaTest() throws Exception {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
@@ -222,6 +228,8 @@ public class PluginReportContentTest {
     Assert.assertEquals(report.getDateUpdated(), innerReport.getDateUpdated());
   }
 
+  /** does the process of TransferredResource To AIP Plugin for testing the Representation
+   * @throws RODAException */
   @Test
   public void siegfriedCorporaTestRepresentation() throws RODAException {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
