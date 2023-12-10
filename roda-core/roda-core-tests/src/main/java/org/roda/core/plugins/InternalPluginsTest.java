@@ -100,6 +100,8 @@ import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
+/** Tests the Transferred Resource To AIP Plugin for a SIP TO AIP
+ * execute testPremisSkeleton to test the representations in PremisSkeleton Plugin */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class InternalPluginsTest {
   private static final String FAKE_REPORTING_CLASS = "NONE";
@@ -293,12 +295,14 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(1, events.getTotalCount());
   }
 
+  /** testing the Premis Skeleton plugin
+   * @throws RODAException
+   * @throws IOException */
   @Test
   public void testPremisSkeleton() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
-    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
-      SelectedItemsList.create(AIP.class, aip.getId()));
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,  SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
 

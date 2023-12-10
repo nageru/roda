@@ -45,7 +45,7 @@ public class IArxiuToAIPPluginUtils {
     Permissions permissions = new Permissions();
     boolean notify = false;
 
-    String aipType = EARKSIPToAIPPluginUtils.getType(sip); // TODO redo in IArxiuToAIPPluginUtils or refactor to commonSIPToAIPPluginUtils
+    final String aipType = EARKSIPToAIPPluginUtils.getType(sip); // TODO redo in IArxiuToAIPPluginUtils or refactor to commonSIPToAIPPluginUtils
 
     AIP aip = model.createAIP(state, parentId, aipType, permissions, ingestSIPUUID, ingestSIPIds,
             ingestJobId, notify, username);
@@ -57,7 +57,8 @@ public class IArxiuToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      // TODO redo as from: EARKSIPToAIPPluginUtils.processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
+      // TODO redo as from: commonSIPToAIPPluginUtils
+      EARKSIPToAIPPluginUtils.processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
 
     // INFO 20190509 hsilva: this is required as the previous instructions

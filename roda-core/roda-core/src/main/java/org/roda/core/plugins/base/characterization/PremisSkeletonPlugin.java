@@ -99,7 +99,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION)) {
       try {
         setSipInformation(JsonUtils
-          .getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION), SIPInformation.class));
+                .getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION), SIPInformation.class));
       } catch (GenericException e) {
         LOGGER.debug("Could not serializable SIP information from JSON", e);
       }
@@ -108,25 +108,29 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException {
+                             JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException {
 
     try {
+      LOGGER.debug("Processing Premis from job plugin info: {}; list of AIPs: {}", jobPluginInfo, list);
       List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP {}", aip.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         Map<String, Map<String, List<String>>> updatedData = getSipInformation().getUpdatedData();
-        if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
+        final List<Representation> representationList = aip.getRepresentations();
+        LOGGER.debug("Processing AIP {} representations: {}", aip // aip.getId()
+                , representationList);
+        if (representationList != null && !representationList.isEmpty()) {
           if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
             try {
               if (getSipInformation().isUpdate()) {
                 // SIP UPDATE
                 if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
-                  for (Representation representation : aip.getRepresentations()) {
+                  for (Representation representation : representationList) {
                     LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                      representation.getId(), algorithms);
+                            representation.getId(), algorithms);
                     // notify is not failing because it is not crucial
                     model.notifyRepresentationUpdated(representation);
                   }
@@ -142,7 +146,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms);
+                          representation.getId(), algorithms);
                   // notify is not failing because it is not crucial
                   model.notifyRepresentationUpdated(representation);
                 }
@@ -159,27 +163,33 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
             Map<String, List<String>> aipData = updatedData.get(aip.getId());
             PluginState state = PluginState.SKIPPED;
 
+            LOGGER.debug("Searching to process AIP {} representations containing '{}': {}", aip.getId(), RodaConstants.RODA_OBJECT_REPRESENTATION,
+                    aipData);
             if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
               List<Representation> filteredList = aip.getRepresentations().stream()
-                .filter(
-                  r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
-                .collect(Collectors.toList());
+                      .filter(
+                              r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
+                      .collect(Collectors.toList());
+              LOGGER.debug("Processing AIP {} filtered representations:", aip.getId()
+                      , filteredList);
 
               for (Representation representation : filteredList) {
                 try {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms);
+                          representation.getId(), algorithms);
                   model.notifyRepresentationUpdated(representation);
                   state = PluginState.SUCCESS;
                 } catch (RODAException | IOException e) {
                   state = PluginState.FAILURE;
                   LOGGER.error("Failed to execute premis skeleton plugin on representation {} from AIP {}",
-                    representation.getId(), representation.getAipId(), e);
+                          representation.getId(), representation.getAipId(), e);
                 }
               }
             }
 
+            LOGGER.debug("Searching to process AIP {} files containing '{}': {}", aip.getId(), RodaConstants.RODA_OBJECT_FILE,
+                    aipData);
             if (aipData.containsKey(RodaConstants.RODA_OBJECT_FILE)) {
               for (String fileString : aipData.get(RodaConstants.RODA_OBJECT_FILE)) {
                 List<String> filePath = Arrays.asList(fileString.split("/"));
@@ -194,7 +204,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 } catch (RODAException | IOException e) {
                   state = PluginState.FAILURE;
                   LOGGER.error("Failed to execute premis skeleton plugin on file {} from AIP {}", fileString,
-                    aip.getId(), e);
+                          aip.getId(), e);
                 }
               }
             }
@@ -202,8 +212,10 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
             jobPluginInfo.incrementObjectsProcessed(state);
           }
         } else {
+          LOGGER.debug("Skipped Premis plugging because aip {} does not have representations: {}", aip, // aip.getId(),
+                  representationList);
           reportItem.setPluginState(PluginState.SKIPPED)
-            .setPluginDetails("Skipped because aip does not have representations.");
+                  .setPluginDetails("Skipped because aip does not have representations.");
           jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
         }
 
@@ -211,9 +223,9 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         try {
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
-            cachedJob);
+                  cachedJob);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
+                 | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
       }
@@ -227,19 +239,19 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException {
+                                        JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (Representation representation : list) {
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-        Representation.class, AIPState.ACTIVE);
+              Representation.class, AIPState.ACTIVE);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
-          representation.getId(), algorithms);
+                representation.getId(), algorithms);
         model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | IOException e) {
@@ -251,9 +263,9 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         boolean notify = true;
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
-          null, reportItem.getPluginState(), "", notify, cachedJob);
+                null, reportItem.getPluginState(), "", notify, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
+               | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
@@ -266,12 +278,12 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException {
+                              JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (File file : list) {
       LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
-        file.getAipId());
+              file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       reportItem.setPluginState(PluginState.SUCCESS);
@@ -288,9 +300,9 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         boolean notify = true;
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, null, null, reportItem.getPluginState(), "", notify, cachedJob);
+                model, index, null, null, reportItem.getPluginState(), "", notify, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
+               | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
@@ -338,7 +350,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+          throws PluginException {
     // do nothing
     return null;
   }

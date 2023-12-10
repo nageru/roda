@@ -155,11 +155,28 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getParameterValues().put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
       getParameterValues().put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
 
-      // 1) unpacking & wellformedness check (transform TransferredResource into
-      // an AIP)
+      // 1) unpacking & wellformedness check (transform TransferredResource into an AIP)
       pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
       IngestStepsUtils.mergeReports(jobPluginInfo, pluginReport);
       final SIPInformation sipInformation = pluginReport.getSipInformation();
+      /* retrieves AIPs based on job plugin info:
+        report id=4d41fcea-cd14-4c11-a8a0-d986e8a53f31-098f6bcd-4621-3373-8ade-4e832627b4f6-251ba81c-f321-4cfb-8c01-f1c73803d2d3
+          jobId=  4d41fcea-cd14-4c11-a8a0-d986e8a53f31
+                          + ¿SIP ID? <- sourceObjectId=098f6bcd-4621-3373-8ade-4e832627b4f6
+                                                                + AIP ID <- outcomeObjectId=251ba81c-f321-4cfb-8c01-f1c73803d2d3
+        allReports = {HashMap@12901}  size = 1
+           "098f6bcd-4621-3373-8ade-4e832627b4f6" -> {HashMap@12911}  size = 1
+            key = "098f6bcd-4621-3373-8ade-4e832627b4f6"
+            value = {HashMap@12911}  size = 1
+             "251ba81c-f321-4cfb-8c01-f1c73803d2d3" -> {Report@12926} "Report [id=4d41fcea-cd14-4c11-a8a0-d986e8a53f31-098f6bcd-4621-3373-8ade-4e832627b4f6-251ba81c-f321-4cfb-8c01-f1c73803d2d3, jobId=4d41fcea-cd14-4c11-a8a0-d986e8a53f31,
+              sourceObjectId=098f6bcd-4621-3373-8ade-4e832627b4f6, sourceObjectClass=org.roda.core.data.v2.ip.TransferredResource, sourceObjectOriginalIds=[], outcomeObjectId=251ba81c-f321-4cfb-8c01-f1c73803d2d3, outcomeObjectClass=org.roda.core.data.v2.ip.AIP, outcomeObjectState=INGEST_PROCESSING, title=org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin, dateCreated=Sat Dec 09 13:07:54 CET 2023, dateUpdated=Sat Dec 09 13:08:23 CET 2023, completionPercentage=20, stepsCompleted=1, totalSteps=5, plugin=org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin, pluginName=Minimal ingest workflow, pluginVersion=2.0, pluginState=SUCCESS, pluginIsMandatory=true, pluginDetails=, htmlPluginDetails=false, reports=[Report [id=4d41fcea-cd14-4c11-a8a0-d986e8a53f31-098f6bcd-4621-3373-8ade-4e832627b4f6-251ba81c-f321-4cfb-8c01-f1c73803d2d3, jobI"
+          reportsFromBeingProcessed = {HashMap@12902}  size = 1
+           "098f6bcd-4621-3373-8ade-4e832627b4f6" -> {HashMap@12911}  size = 1
+          transferredResourceToAipIds = {HashMap@12903}  size = 1
+           "098f6bcd-4621-3373-8ade-4e832627b4f6" -> {ArrayList@12918}  size = 1
+          aipIdToTransferredResourceIds = {HashMap@12904}  size = 1
+           "251ba81c-f321-4cfb-8c01-f1c73803d2d3" -> {ArrayList@12922}  size = 1
+       */
       final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
       jobPluginInfo.updateMetaPluginInformation(report, cachedJob);
       PluginHelper.updateJobReportMetaPluginInformation(this, model, report, cachedJob, jobPluginInfo);
@@ -172,6 +189,17 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       List<IngestStep> steps = getIngestSteps();
 
       for (IngestStep step : steps) {
+        /* creates the 'bundle' used for search based on the found 'aip' with matching 'parentId' & 'ingestJobId'
+          - aips: AIP{id='251ba81c-f321-4cfb-8c01-f1c73803d2d3',
+              parentId='4f728375-1078-4826-98d1-53b20bfa344f', type='MIXED', instanceId='null', state=INGEST_PROCESSING, permissions=Permissions [users={CREATE=[admin], READ=[admin], UPDATE=[admin], DELETE=[admin], GRANT=[admin]}, groups={CREATE=[administrators], READ=[administrators], UPDATE=[administrators], DELETE=[administrators], GRANT=[administrators]}], descriptiveMetadata=[DescriptiveMetadata [id=metadata.xml, aipId=251ba81c-f321-4cfb-8c01-f1c73803d2d3, representationId=null, type=key-value, version=null]], representations=[Representation [aipId=251ba81c-f321-4cfb-8c01-f1c73803d2d3, id=76067fea-2361-4979-a595-f978b2071f97, original=true, type=MIXED, instanceId=null, descriptiveMetadata=[], createdOn=Sat Dec 09 13:07:58 CET 2023, createdBy=admin, updatedOn=Sat Dec 09 13:07:58 CET 2023, updatedBy=admin, representationStates=[ORIGINAL]]], ingestSIPUUID='098f6bcd-4621-3373-8ade-4e832627b4f6', ingestSIPIds=[test],
+              ingestJobId='4d41fcea-cd14-4c11-a8a0-d986e8a53f31', ingestUpdateJobIds=[], ghost=null, format=AIPFormat [name=null, version=null], relationships=[], createdOn=Sat Dec 09 13:07:54 CET 2023, createdBy='admin', updatedOn=Sat Dec 09 13:08:01 CET 2023, updatedBy='admin', disposal='DisposalAIPMetadata{schedule=null, holds=[], confirmation=null}}
+          - getParameterValues()
+            "parameter.force_parent_id" -> "false"
+            "parameter.parent_id" -> "4f728375-1078-4826-98d1-53b20bfa344f"
+            "job.id" -> "4d41fcea-cd14-4c11-a8a0-d986e8a53f31"
+            "parameter.lock_request_uuid" -> "e1be8848-04ec-4f41-9452-b340e19bce05"
+            "parameter.sip_to_aip_class" -> "org.roda.core.plugins.base.ingest.TransferredResourceToAIPPlugin"
+         */
         IngestStepBundle bundle = new IngestStepBundle(this, index, model, storage, jobPluginInfo,
           getPluginParameter(step.getParameterName()), getParameterValues(), resources, aips, cachedJob,
           sipInformation);
