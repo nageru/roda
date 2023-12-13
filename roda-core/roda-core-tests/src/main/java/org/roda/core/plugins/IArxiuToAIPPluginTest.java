@@ -137,6 +137,14 @@ public class IArxiuToAIPPluginTest {
     final String aipId = aip.getId();
     AssertJUnit.assertNotNull(aipId);
 
+    final List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+    AssertJUnit.assertNotNull(descriptiveMetadataList);
+    AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
+
+    final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, "OTHER", true));
+    AssertJUnit.assertNotNull(otherMetadataList);
+    AssertJUnit.assertNotSame(0, otherMetadataList.size());
+
     final List<Representation> representations = aip.getRepresentations();
     AssertJUnit.assertNotNull(representations);
     AssertJUnit.assertNotSame(0, representations.size());
@@ -151,11 +159,11 @@ public class IArxiuToAIPPluginTest {
       AssertJUnit.assertNotSame(0, representationBinaryFiles.size());
       reusableAllFiles.addAll(representationBinaryFiles);
 
-      final List<DescriptiveMetadata> descriptiveMetadataList = representation.getDescriptiveMetadata(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
-      AssertJUnit.assertNotNull(descriptiveMetadataList);
-      AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
+      final List<DescriptiveMetadata> repDescriptiveMetadataList = representation.getDescriptiveMetadata(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
+      AssertJUnit.assertNotNull(repDescriptiveMetadataList);
+      AssertJUnit.assertNotSame(0, repDescriptiveMetadataList.size());
 
-      for (DescriptiveMetadata descriptiveMetadata: descriptiveMetadataList){
+      for (DescriptiveMetadata descriptiveMetadata: repDescriptiveMetadataList){
         AssertJUnit.assertNotNull(descriptiveMetadata);
         final String foundDescriptiveMetadata = descriptiveMetadata.getId();
         /* descriptiveMetadata.getId() is not found;
@@ -164,9 +172,9 @@ public class IArxiuToAIPPluginTest {
         /* TODO AssertJUnit.assertNotSame(0, representationDescriptiveMetadataFiles.size());
          */
       }
-      final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, representationId));
-      AssertJUnit.assertNotNull(otherMetadataList);
-      AssertJUnit.assertNotSame(0, otherMetadataList.size());
+      final List<OtherMetadata> repOtherMetadataList = getItems(model.listOtherMetadata(aipId, representationId));
+      AssertJUnit.assertNotNull(repOtherMetadataList);
+      AssertJUnit.assertNotSame(0, repOtherMetadataList.size());
     }
 
     // All folders and files...
