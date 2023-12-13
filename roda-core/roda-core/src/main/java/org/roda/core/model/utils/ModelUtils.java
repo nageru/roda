@@ -74,6 +74,9 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * Model related utility class
  *
@@ -791,30 +794,32 @@ public final class ModelUtils {
       throw new RequestNotValidException("File suffix cannot be null");
     }
 
-    if (StringUtils.isBlank(type)) {
+    if (isBlank(type)) {
       throw new RequestNotValidException("Type cannot be empty");
     }
 
-    List<String> path;
+    if (isBlank(aipId)) {
+      throw new RequestNotValidException("AIP id cannot be null");
+    }
 
-    if (aipId != null && representationId != null && directoryPath != null && fileName != null) {
-      // other metadata pertaining to a file
-      path = getRepresentationOtherMetadataPath(aipId, representationId, type);
+    final List<String> path = getRepresentationOtherMetadataPath(aipId, representationId, type);
+    if (directoryPath != null && isNotBlank(fileName)) {
+      // other metadata pertaining to a file in a directory
       path.addAll(directoryPath);
       path.add(fileName + fileSuffix);
-    } else if (aipId != null && representationId != null) {
+    } else if (isNotBlank(fileName)) {
+      // other metadata pertaining to a file
+      path.add(fileName + fileSuffix);
+    } else if (representationId != null) {
       // other metadata pertaining to a representation
-      path = getRepresentationOtherMetadataPath(aipId, representationId, type);
-      path.add(representationId + fileSuffix);
+        path.add(representationId + fileSuffix);
       // XXX What if representation id is equal to a file id? Maybe move
       // this to AIP metadata folder and have id
       // [aipId+"-"+representationId+fileSuffix]
-    } else if (aipId != null) {
-      path = getRepresentationOtherMetadataPath(aipId, representationId, type);
-      path.add(aipId + fileSuffix);
-    } else {
-      throw new RequestNotValidException("AIP id cannot be null");
+    }  else {
+        path.add(aipId + fileSuffix);
     }
+
     return DefaultStoragePath.parse(path);
   }
 
