@@ -157,20 +157,20 @@ public class EARKSIPToAIPPluginUtils {
     List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
-      final String descriptiveMetadataId = StringUtils.isNotBlank(dm.getId()) ? dm.getId() :
-              dm.getMetadata().getFileName();
+      final String descriptiveMetadataBinary = StringUtils.isNotBlank(dm.getMetadata().getFileName()) ? dm.getMetadata().getFileName() :
+              dm.getId(); // uses the descriptive metadata file name for the descriptive Metadata Binary if existing, otherwise the metadata id
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
       String metadataType = getMetadataType(dm);
       String metadataVersion = dm.getMetadataVersion();
       try {
-        model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+        model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataBinary, payload, metadataType,
           metadataVersion, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
           Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
-          model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
+          model.updateDescriptiveMetadata(aipId, descriptiveMetadataBinary, payload, metadataType, metadataVersion,
             properties);
         } else {
           throw e;

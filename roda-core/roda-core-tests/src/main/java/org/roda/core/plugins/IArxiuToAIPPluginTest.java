@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
@@ -132,6 +133,9 @@ public class IArxiuToAIPPluginTest {
   @Test
   public void testIngestIArxiuSIP() throws Exception {
     final AIP aip = ingestCorpora(); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
+    AssertJUnit.assertNotNull(aip);
+    final String aipId = aip.getId();
+    AssertJUnit.assertNotNull(aipId);
 
     final List<Representation> representations = aip.getRepresentations();
     AssertJUnit.assertNotNull(representations);
@@ -141,9 +145,9 @@ public class IArxiuToAIPPluginTest {
     for (Representation representation: representations) {
       AssertJUnit.assertNotNull(representation);
 
-      final String foundBinaryFileId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
-      AssertJUnit.assertNotNull(foundBinaryFileId);
-      final List<File> representationBinaryFiles = getAllFiles(aip.getId(), foundBinaryFileId);
+      final String representationId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
+      AssertJUnit.assertNotNull(representationId);
+      final List<File> representationBinaryFiles = getItems(model.listFilesUnder(aipId,  representationId, true));
       AssertJUnit.assertNotSame(0, representationBinaryFiles.size());
       reusableAllFiles.addAll(representationBinaryFiles);
 
@@ -152,12 +156,17 @@ public class IArxiuToAIPPluginTest {
       AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
 
       for (DescriptiveMetadata descriptiveMetadata: descriptiveMetadataList){
-        final String foundMetadataFile = descriptiveMetadata.getId();
-        final List<File> representationDescriptiveMetadataFiles = getAllFiles(aip.getId(), foundMetadataFile);
-        AssertJUnit.assertNotNull(foundMetadataFile);
-        // descriptiveMetadata.getId() is not found; TODO AssertJUnit.assertNotSame(0, representationDescriptiveMetadataFiles.size());
-        reusableAllFiles.addAll(representationDescriptiveMetadataFiles);
+        AssertJUnit.assertNotNull(descriptiveMetadata);
+        final String foundDescriptiveMetadata = descriptiveMetadata.getId();
+        /* descriptiveMetadata.getId() is not found;
+         * the file is identified: fdb3d711-6c01-4934-8a95-8f57bb4ddbaf-index.xml-DOC_1.xml*/
+        AssertJUnit.assertNotNull(foundDescriptiveMetadata);
+        /* TODO AssertJUnit.assertNotSame(0, representationDescriptiveMetadataFiles.size());
+         */
       }
+      final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, representationId));
+      AssertJUnit.assertNotNull(otherMetadataList);
+      AssertJUnit.assertNotSame(0, otherMetadataList.size());
     }
 
     // All folders and files...
@@ -167,16 +176,11 @@ public class IArxiuToAIPPluginTest {
     AssertJUnit.assertTrue(reusableAllFiles.stream().allMatch(file -> file != null));
   }
 
-  private List<File> getAllFiles(String aipId, String fileId) throws Exception {
-
-    final CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId,
-            fileId, true);
-
-    final List<File> foundFiles = new ArrayList<>();
-    Iterables.addAll(foundFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+  private static <T> List<T> getItems(CloseableIterable<OptionalWithCause<T>> all) {
+    final List<T> found = new ArrayList<>();
+    Iterables.addAll(found, Lists.newArrayList(all).stream().filter(OptionalWithCause::isPresent)
             .map(OptionalWithCause::get).collect(Collectors.toList()));
-
-    return foundFiles;
+    return found;
   }
 
 
