@@ -53,12 +53,12 @@ public class IArxiuToAIPPluginUtils {
     PluginHelper.acquireObjectLock(aip, plugin); // TODO needed acquireObjectLock ?
 
     // process IP information
-    EARKSIPToAIPPluginUtils.processIPInformation(model, sip, aip.getId(), notify, false); // TODO redo in IArxiuToAIPPluginUtils or refactor to commonSIPToAIPPluginUtils
+    EARKSIPToAIPPluginUtils.processIArxiuIPInformation(model, sip, aip.getId(), notify); // TODO redo in IArxiuToAIPPluginUtils or refactor to commonSIPToAIPPluginUtils
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
       // TODO redo as from: commonSIPToAIPPluginUtils
-      EARKSIPToAIPPluginUtils.processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
+      EARKSIPToAIPPluginUtils.processIArxiuIPRepresentationInformation(model, representation, aip.getId(), notify, username);
     }
 
     // INFO 20190509 hsilva: this is required as the previous instructions

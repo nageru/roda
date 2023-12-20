@@ -45,8 +45,12 @@ import org.roda_project.commons_ip.model.MetadataType;
 import org.roda_project.commons_ip.model.RepresentationStatus;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.MetadataType.MetadataTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EARKSIPToAIPPluginUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
   private EARKSIPToAIPPluginUtils() {
     // do nothing
@@ -134,6 +138,24 @@ public class EARKSIPToAIPPluginUtils {
     return model.updateAIP(aip, username);
   }
 
+  protected static void processIArxiuIPInformation(ModelService model, SIP sip, String aipId, boolean notify)
+          throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+          NotFoundException, ValidationException {
+    // process descriptive metadata; TODO pending for iArxiu DC schema validation (declaration of element 'oai:dc')
+    /*processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, false);*/
+
+    // process other metadata
+    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify);
+
+    // process preservation metadata... Not existing for iArxiu! to delete
+    /*processPreservationMetadata(model, sip.getPreservationMetadata(), aipId, Optional.empty(), notify);*/
+
+    // process documentation... Not existing for iArxiu! to delete
+    /*processDocumentation(model, sip.getDocumentation(), aipId, null, false);*/
+
+    // process schemas
+    /*processSchemas(model, sip.getSchemas(), aipId, null, false);*/
+  }
   protected static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException, ValidationException {
@@ -167,7 +189,7 @@ public class EARKSIPToAIPPluginUtils {
           metadataVersion, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
-          Map<String, String> properties = new HashMap<>();
+          final Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataBinary, payload, metadataType, metadataVersion,
@@ -176,17 +198,21 @@ public class EARKSIPToAIPPluginUtils {
           throw e;
         }
       }
+      LOGGER.info("{} AIP '{}' (representation {}) DescriptiveMetadata type {} with binary: {}", update ? "Update" : "Create", aipId, representationId != null ? "'" + representationId + "'" : "none",
+              metadataType, descriptiveMetadataBinary);
     }
   }
 
   private static void processOtherMetadata(ModelService model, List<IPMetadata> otherMetadata, String aipId,
     Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    RequestNotValidException, AuthorizationDeniedException {
 
     for (IPMetadata pm : otherMetadata) {
       IPFile file = pm.getMetadata();
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
+      LOGGER.info("Create or Update AIP '{}' (representation {}) OtherMetadata type {} with file: {}", aipId, representationId.map(id -> "'" + id + "'").orElse("none"),
+              pm.getMetadataType(), file);
       model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(),
         file.getFileName(), "", pm.getMetadataType().asString(), fileContentPayload, notify);
     }
@@ -282,32 +308,70 @@ public class EARKSIPToAIPPluginUtils {
       notify);
 
     // process representation files
-    for (IPFile file : sr.getData()) {
-      List<String> directoryPath = file.getRelativeFolders();
-      String fileId = file.getFileName();
-      ContentPayload payload = new FSPathContentPayload(file.getPath());
-      try {
-        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
-        if (reportItem != null && update) {
-          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
-        }
-      } catch (AlreadyExistsException e) {
-        if (update) {
-          File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
-            notify);
-          if (reportItem != null) {
-            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
-          }
-        } else
-          throw e;
-      }
-    }
+    processRepresentationFiles(model, aipId, sr, representation, update, notify, reportItem);
 
     // process representation documentation
     processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), false);
 
     // process representation schemas
     processSchemas(model, sr.getSchemas(), aipId, representation.getId(), false);
+  }
+
+  public static void processIArxiuIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
+                                                        boolean notify, String username) throws RequestNotValidException,
+          GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    String representationType = getType(sr);
+    boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
+
+    final Representation representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
+              username);
+    final String representationId = representation.getId();
+    LOGGER.info("Created AIP '{}' representation '{}' Information type {}: {}", aipId, representationId, representationType, representation);
+
+    // process representation descriptive metadata
+    processDescriptiveMetadata(model, aipId, representationId, sr.getDescriptiveMetadata(), notify, false);
+
+    // process other metadata
+    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representationId), notify);
+
+    // process representation preservation metadata; Not a PreservationMetadata in iArxiu
+    /* processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
+            notify);*/
+
+    // process representation files
+    processRepresentationFiles(model, aipId, sr, representation, false, notify, null);
+
+    // process representation documentation
+    /*processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), false);*/
+
+    // process representation schemas
+    /*processSchemas(model, sr.getSchemas(), aipId, representation.getId(), false);*/
+  }
+
+  private static void processRepresentationFiles(ModelService model, String aipId, IPRepresentation sr, Representation representation, boolean update, boolean notify, Report reportItem) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException {
+    for (IPFile file : sr.getData()) {
+      List<String> directoryPath = file.getRelativeFolders();
+      String fileId = file.getFileName();
+      ContentPayload payload = new FSPathContentPayload(file.getPath());
+      final String representationId = representation.getId();
+      try {
+        final File createdFile = model.createFile(aipId, representationId, directoryPath, fileId, payload, notify);
+        if (reportItem != null && update) {
+          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
+        }
+      } catch (AlreadyExistsException e) {
+        if (update) {
+          final File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
+                  notify);
+          if (reportItem != null) {
+            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
+          }
+        } else {
+          throw e;
+        }
+      }
+      LOGGER.info("{} AIP '{}' representation '{}' file: {}", update ? "Update" : "Create", aipId, representationId, file);
+    }
   }
 
   protected static String getType(SIP sip) {
