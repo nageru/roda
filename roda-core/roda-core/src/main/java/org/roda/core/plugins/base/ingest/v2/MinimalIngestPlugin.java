@@ -51,6 +51,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
         "Force the use of the selected parent node even if the SIPs provide information about the desired parent."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
+        // minimal ingest steps initially not needed to have the Descriptive metadata validation disabled
         DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
         DescriptiveMetadataValidationPlugin.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
