@@ -154,8 +154,9 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
-          DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
-          DescriptiveMetadataValidationPlugin.getStaticDescription()));
+          DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN,
+                // allows to disable the Descriptive metadata validation in the Ingest configuration by the user
+                "true", false, false, DescriptiveMetadataValidationPlugin.getStaticDescription()));
 
       PluginManager pluginManager = RodaCoreFactory.getPluginManager();
       Plugin<?> plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);

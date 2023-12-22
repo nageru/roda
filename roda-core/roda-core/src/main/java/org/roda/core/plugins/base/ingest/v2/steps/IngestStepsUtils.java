@@ -71,6 +71,10 @@ public class IngestStepsUtils {
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plugin: {}", step.getPluginName(), e);
 
+      /* Option to... check on parameter.relax_descriptive_metadata_validation.sip_to_aip_class=org.roda.core.plugins.base.ingest.IArxiuToAIPPlugin
+          (as in "parameter.do_descriptive_metadata_validation" and "parameter.sip_to_aip_class=org.roda.core.plugins.base.ingest.IArxiuToAIPPlugin")
+       */
+
       Report report = PluginHelper.initPluginReport(plugin);
       for (AIP aip : bundle.getAips()) {
         Report reportItem = PluginHelper.initPluginReportItem(plugin, aip.getId(), AIP.class,
@@ -126,6 +130,11 @@ public class IngestStepsUtils {
           Report aipReport = transferredResourcejobPluginInfoEntry.getValue().get(aipId);
           if (step.isMandatory() && aipReport.getPluginState() == PluginState.FAILURE) {
             LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
+          /* Option to... check on parameter.relax_descriptive_metadata_validation.sip_to_aip_class=org.roda.core.plugins.base.ingest.IArxiuToAIPPlugin
+            (as in "parameter.do_descriptive_metadata_validation" and "parameter.sip_to_aip_class=org.roda.core.plugins.base.ingest.IArxiuToAIPPlugin")
+          */
+            LOGGER.info("AIP {} error.\n\tPlugin: {};\n\treport: {};\n\tconf: {}", aipReport.getOutcomeObjectId(), // TODO CLEAN UP!
+                    jobPluginInfo, aipReport, transferredResourcejobPluginInfoEntry);
             oneTransferredResourceAipFailed = true;
             break;
           } else {

@@ -142,7 +142,7 @@ public class EARKSIPToAIPPluginUtils {
           throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
           NotFoundException, ValidationException {
     // process descriptive metadata; TODO pending for iArxiu DC schema validation (declaration of element 'oai:dc')
-    /*processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, false);*/
+    processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, false);
 
     // process other metadata
     processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify);
