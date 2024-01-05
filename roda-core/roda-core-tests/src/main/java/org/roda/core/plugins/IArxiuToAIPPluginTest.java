@@ -13,6 +13,10 @@ import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -31,6 +35,7 @@ import org.roda.core.plugins.base.ingest.IArxiuToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -45,6 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class IArxiuToAIPPluginTest {
@@ -133,78 +140,106 @@ public class IArxiuToAIPPluginTest {
 
   @Test
   public void testIngestIArxiuCesca1SIP() throws Exception {
-    final AIP aip = testIngestIArxiuSIP(CorporaConstants.I_ARXIU_CESCA1_SIP);
-    expectDescriptiveMetadataTypes(aip.getDescriptiveMetadata(), "DC",
-            "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
+    final AIP aip = ingestCorpora(CorporaConstants.I_ARXIU_CESCA1_SIP); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
+    final String aipId = verifyIngestedAip(aip);
+
+    final  List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList,
+            "DC", "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
+    Assert.assertEquals(2, descriptiveMetadataList.size());
+
+    final List<Representation> representations = aip.getRepresentations();
+    verifyIngestedRepresentations(aipId, representations, "DC", "urn:iarxiu:2.0:vocabularies:cesca:Voc_document_exp");
+    Assert.assertEquals(1, representations.size());
+
+    verifyIngestedOtherFiles(aipId, 0); // does the search and verifies none (all used types are known)
   }
 
   @Test
   public void testIngestIArxiuCescaAppPreSIP() throws Exception {
-    final AIP aip = testIngestIArxiuSIP(CorporaConstants.I_ARXIU_CESCA_APP_PRE_SIP);
-    expectDescriptiveMetadataTypes(aip.getDescriptiveMetadata(), "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient", "urn:iarxiu:2.0:vocabularies:cesca:Voc_UPF");
+    final AIP aip = ingestCorpora(CorporaConstants.I_ARXIU_CESCA_APP_PRE_SIP);
+    final String aipId = verifyIngestedAip(aip);
+
+    final  List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList,
+            "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient", "urn:iarxiu:2.0:vocabularies:cesca:Voc_UPF");
+    Assert.assertEquals(2, descriptiveMetadataList.size());
+
+    final List<Representation> representations = aip.getRepresentations();
+    verifyIngestedRepresentations(aipId, representations, "urn:iarxiu:2.0:vocabularies:cesca:Voc_document_exp");
+    Assert.assertEquals(4, representations.size());
+
+    verifyIngestedOtherFiles(aipId, 0); // does the search and verifies none (all used types are known)
   }
 
-  private AIP testIngestIArxiuSIP(String iArxiuFileNameSample) throws Exception {
-    final AIP aip = ingestCorpora(iArxiuFileNameSample); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
+  private String verifyIngestedAip(AIP aip) {
     AssertJUnit.assertNotNull(aip);
     final String aipId = aip.getId();
     AssertJUnit.assertNotNull(aipId);
+    return aipId;
+  }
 
-    final List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+  private void verifyIngestedDescriptiveMetadata(String aipId, List<DescriptiveMetadata> descriptiveMetadataList, String... types) throws Exception {
+
     AssertJUnit.assertNotNull(descriptiveMetadataList);
-    AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
+    AssertJUnit.assertTrue(!descriptiveMetadataList.isEmpty());
     // verify the always present iArxiu expedient types
-    expectDescriptiveMetadataTypes(descriptiveMetadataList, "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
+    expectDescriptiveMetadataTypes(descriptiveMetadataList, types);
+    final List<File> binaryFiles = getItems(model.listFilesUnder(aipId,  null, true));
+    AssertJUnit.assertNotNull(binaryFiles);
+  }
 
-    final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, "OTHER", true));
-    AssertJUnit.assertNotNull(otherMetadataList);
-    /*AssertJUnit.assertNotSame(0, otherMetadataList.size());*/
+  private void verifyIngestedRepresentations(String aipId, List<Representation> representations, String... expectedTypes) throws Exception {
 
-    final List<Representation> representations = aip.getRepresentations();
     AssertJUnit.assertNotNull(representations);
-    AssertJUnit.assertNotSame(0, representations.size());
+    AssertJUnit.assertTrue(!representations.isEmpty());
 
-    final List<File> reusableAllFiles = new ArrayList<>();
+    final List<String> expectedTypesList = new ArrayList<>(asList(expectedTypes));
     for (Representation representation: representations) {
       AssertJUnit.assertNotNull(representation);
 
       final String representationId = representation.getId(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
       AssertJUnit.assertNotNull(representationId);
       final List<File> representationBinaryFiles = getItems(model.listFilesUnder(aipId,  representationId, true));
-      AssertJUnit.assertNotSame(0, representationBinaryFiles.size());
-      reusableAllFiles.addAll(representationBinaryFiles);
+      verifyBinaryFiles(representationBinaryFiles);
 
       final List<DescriptiveMetadata> repDescriptiveMetadataList = representation.getDescriptiveMetadata(); // BagIt retrieves the files from the AIP first representation id: aip.getRepresentations().get(0).getId()
       AssertJUnit.assertNotNull(repDescriptiveMetadataList);
-      AssertJUnit.assertNotSame(0, repDescriptiveMetadataList.size());
+      AssertJUnit.assertTrue(!repDescriptiveMetadataList.isEmpty());
 
       for (DescriptiveMetadata descriptiveMetadata: repDescriptiveMetadataList){
         final String metadataType = descriptiveMetadata.getType();
         AssertJUnit.assertNotNull(metadataType);
-        AssertJUnit.assertTrue("Expected representation metadata not of 'DC' or 'Voc_document_exp' types: " + descriptiveMetadata,
-                metadataType.equalsIgnoreCase("DC")
-                        || metadataType.equalsIgnoreCase("urn:iarxiu:2.0:vocabularies:cesca:Voc_document_exp"));
+        AssertJUnit.assertTrue("Expected representation metadata type (" + asList(expectedTypes) + ") not matching '"+metadataType+"': " + descriptiveMetadata,
+                asList(expectedTypes).contains(metadataType));
+        expectedTypesList.remove(metadataType);
 
         AssertJUnit.assertNotNull(descriptiveMetadata);
         final String foundDescriptiveMetadata = descriptiveMetadata.getId();
         /* descriptiveMetadata.getId() is not found;
          * the file is identified: fdb3d711-6c01-4934-8a95-8f57bb4ddbaf-index.xml-DOC_1.xml*/
         AssertJUnit.assertNotNull(foundDescriptiveMetadata);
-        /* Model files not exposed: AssertJUnit.assertNotSame(0, representationDescriptiveMetadataFiles.size()); */
+        /* Model files not exposed: AssertJUnit.assertNotEquals(0, representationDescriptiveMetadataFiles.size()); */
       }
-      final List<OtherMetadata> repOtherMetadataList = getItems(model.listOtherMetadata(aipId, representationId));
-      AssertJUnit.assertNotNull(repOtherMetadataList);
-      /*AssertJUnit.assertNotSame(0, repOtherMetadataList.size());*/
 
     }
 
-    // All folders and files...
-    AssertJUnit.assertNotSame( 0, // the FOLDERS_COUNT + the FILES_COUNT: from SIP representation data: BIN_1/index.xml
-            reusableAllFiles.size());
-    // ...exists
-    AssertJUnit.assertTrue(reusableAllFiles.stream().allMatch(file -> file != null));
+    Assert.assertEquals(0, expectedTypesList.size(), "Not all the expected types found: " + expectedTypesList);
+  }
 
-    return aip;
+  private static void verifyBinaryFiles(List<File> binaryFiles){
+    AssertJUnit.assertNotNull(binaryFiles);
+    // All folders and files...
+    AssertJUnit.assertTrue(!binaryFiles.isEmpty());// the FOLDERS_COUNT + the FILES_COUNT: as example from SIP representation data: BIN_1/index.xml
+
+    // ...exists
+    AssertJUnit.assertTrue(binaryFiles.stream().allMatch(file -> file != null));
+  }
+
+  private static void verifyIngestedOtherFiles(String aipId, int expectedNumber) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, "OTHER", true));
+    AssertJUnit.assertNotNull(otherMetadataList);
+    AssertJUnit.assertTrue(expectedNumber == otherMetadataList.size());
   }
 
   private static List<String> expectDescriptiveMetadataTypes(List<DescriptiveMetadata> descriptiveMetadataList, String... expectedTypes){
