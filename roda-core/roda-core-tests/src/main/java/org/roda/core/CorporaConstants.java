@@ -144,7 +144,9 @@ public final class CorporaConstants {
   public static final String EARK_SIP_204_UPDATE = "eark_sip_2.0.4_update.zip";
   public static final String EARK_SIP_UPDATE_USER = "admin";
   public static final String BAGIT_SIP = "bagit.zip";
-  public static final String I_ARXIU_SIP = "cesca_earxiu1.zip";
+  public static final String I_ARXIU_CESCA1_SIP = "cesca_earxiu1.zip";
+  /** sample from Cesca e-arxiu app pre 14 nov 2016 (12392) */
+  public static final String I_ARXIU_CESCA_APP_PRE_SIP = "cesca_earxiu-app-pre.zip";
   public static final String TRANSFERRED_RESOURCE = "transferredresource";
   public static final String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
 

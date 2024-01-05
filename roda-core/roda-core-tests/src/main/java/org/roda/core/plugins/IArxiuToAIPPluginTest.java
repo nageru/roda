@@ -88,20 +88,20 @@ public class IArxiuToAIPPluginTest {
     FSUtils.deletePath(basePath);
   }
 
-  private TransferredResource createCorpora() throws Exception {
+  private TransferredResource createCorpora(String corporaFileNameSample) throws Exception {
 
     final TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
-    final Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.I_ARXIU_SIP);
+    final Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(corporaFileNameSample);
 
-    final TransferredResource transferredResourceCreated = f.createFile(null, CorporaConstants.I_ARXIU_SIP,
+    final TransferredResource transferredResourceCreated = f.createFile(null, corporaFileNameSample,
       Files.newInputStream(sip));
 
     index.commit(TransferredResource.class);
     return index.retrieve(TransferredResource.class, transferredResourceCreated.getUUID(), new ArrayList<>());
   }
 
-  private AIP ingestCorpora() throws Exception {
+  private AIP ingestCorpora(String corporaFileNameSample) throws Exception {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
     AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -110,7 +110,7 @@ public class IArxiuToAIPPluginTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
 
-    final TransferredResource transferredResource = createCorpora();
+    final TransferredResource transferredResource = createCorpora(corporaFileNameSample);
     AssertJUnit.assertNotNull(transferredResource);
 
     Job job = TestsHelper.executeJob(IArxiuToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
@@ -130,9 +130,22 @@ public class IArxiuToAIPPluginTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+
   @Test
-  public void testIngestIArxiuSIP() throws Exception {
-    final AIP aip = ingestCorpora(); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
+  public void testIngestIArxiuCesca1SIP() throws Exception {
+    final AIP aip = testIngestIArxiuSIP(CorporaConstants.I_ARXIU_CESCA1_SIP);
+    expectDescriptiveMetadataTypes(aip.getDescriptiveMetadata(), "DC",
+            "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
+  }
+
+  @Test
+  public void testIngestIArxiuCescaAppPreSIP() throws Exception {
+    final AIP aip = testIngestIArxiuSIP(CorporaConstants.I_ARXIU_CESCA_APP_PRE_SIP);
+    expectDescriptiveMetadataTypes(aip.getDescriptiveMetadata(), "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient", "urn:iarxiu:2.0:vocabularies:cesca:Voc_UPF");
+  }
+
+  private AIP testIngestIArxiuSIP(String iArxiuFileNameSample) throws Exception {
+    final AIP aip = ingestCorpora(iArxiuFileNameSample); // ingest an iArxiu SIP (zip from local resources) returning the created AIP
     AssertJUnit.assertNotNull(aip);
     final String aipId = aip.getId();
     AssertJUnit.assertNotNull(aipId);
@@ -140,9 +153,8 @@ public class IArxiuToAIPPluginTest {
     final List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
     AssertJUnit.assertNotNull(descriptiveMetadataList);
     AssertJUnit.assertNotSame(0, descriptiveMetadataList.size());
-    final List<String> descriptiveMetadataTypes = descriptiveMetadataList.stream().map(descriptiveMetadata -> descriptiveMetadata.getType()).collect(Collectors.toList());
-    AssertJUnit.assertTrue("Expected descriptive metadata 'DC' type not found: " + descriptiveMetadataTypes, descriptiveMetadataTypes.contains("DC"));
-    AssertJUnit.assertTrue("Expected descriptive metadata 'Voc_expedient' type not found: " + descriptiveMetadataTypes, descriptiveMetadataTypes.contains("urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient"));
+    // verify the always present iArxiu expedient types
+    expectDescriptiveMetadataTypes(descriptiveMetadataList, "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
 
     final List<OtherMetadata> otherMetadataList = getItems(model.listOtherMetadata(aipId, "OTHER", true));
     AssertJUnit.assertNotNull(otherMetadataList);
@@ -191,6 +203,16 @@ public class IArxiuToAIPPluginTest {
             reusableAllFiles.size());
     // ...exists
     AssertJUnit.assertTrue(reusableAllFiles.stream().allMatch(file -> file != null));
+
+    return aip;
+  }
+
+  private static List<String> expectDescriptiveMetadataTypes(List<DescriptiveMetadata> descriptiveMetadataList, String... expectedTypes){
+    final List<String> descriptiveMetadataTypes = descriptiveMetadataList.stream().map(descriptiveMetadata -> descriptiveMetadata.getType()).collect(Collectors.toList());
+    for (String expectedType: expectedTypes) {
+      AssertJUnit.assertTrue("Expected descriptive metadata '"+expectedType+"' type not found: " + descriptiveMetadataTypes, descriptiveMetadataTypes.contains(expectedType));
+    }
+    return descriptiveMetadataTypes;
   }
 
   private static <T> List<T> getItems(CloseableIterable<OptionalWithCause<T>> all) {
