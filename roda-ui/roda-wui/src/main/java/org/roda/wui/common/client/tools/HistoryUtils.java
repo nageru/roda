@@ -105,7 +105,10 @@ public class HistoryUtils {
     return historyPath;
   }
 
-  public static List<String> decodeList(List<String> splitted) {
+  /** Reverse {@link #createPathToken(List)} operation by applying the {@link URL#decodeQueryString(String)} for QUERY strings ( instead of {@link URL#decodePathSegment(String)} for PATH strings)
+   * @param splitted
+   * @return */
+  private static List<String> decodeList(List<String> splitted) {
     List<String> tokens = new ArrayList<>();
     for (String item : splitted) {
       tokens.add(URL.decodeQueryString(item));
@@ -113,6 +116,8 @@ public class HistoryUtils {
     return tokens;
   }
 
+  /** {@link #decodeList(List)} tokens from the {@link Window.Location#getHash()}
+   * @return */
   public static List<String> getCurrentHistoryPath() {
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
@@ -161,7 +166,7 @@ public class HistoryUtils {
    * {@link #createQueryToken(List)}
    * @param path */
   public static void newHistory(List<String> path) {
-    String hash = createQueryToken(path);
+    String hash = createQueryToken(path); // as QUERY string instead of PATH string: {#createPathToken(List)}
     Window.Location.assign("#" + hash);
   }
 
@@ -169,7 +174,7 @@ public class HistoryUtils {
    * {@link #createQueryToken(List)}
    * @param path */
   public static void replaceHistory(List<String> path) {
-    String hash = createQueryToken(path);
+    String hash = createQueryToken(path); // as QUERY string instead of PATH string: {#createPathToken(List)}
     Window.Location.replace("#" + hash);
   }
 

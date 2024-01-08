@@ -104,6 +104,14 @@ Testing RODA on different browsers is done in an easy way thanks to BrowserStack
 
 * Lack of permissions to download dependencies when building RODA: to compile you need to set your GitHub access token in your settings.xml as described on https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token
 * Problems may arise when using GWT Dev Mode and having in the classpath a different jetty version
+* Roda UI not supporting 'html escape' chars in AIP & Representations Paths: ends up in a not found. See commit 5cdadac for a case fix; and [file for other potential cases fix](./dev-notes/History_AIP_based_link__window_location_switch_from_QUERY_to_PATH_refactor.patch)
+```
+wrong: 404
+    http://localhost:8080/api/v1/representations/1fcf186b-52a7-4993-b7f0-ee9431f5ac56/representation-with-no+html+chars+escape-1-v1.xml/descriptive_metadata/document-with-no+html+chars+escape_1.xml
+    { "type": "error", "message": "An error has occurred, to get more details use the error identifier: 371a2566-c509-4eea-98e8-def520798a8a" }
+correct: 200
+    http://localhost:8080/api/v1/representations/1fcf186b-52a7-4993-b7f0-ee9431f5ac56/representation-with-no%20html%20chars+escape-1-v1.xml/descriptive_metadata/document-with-no%20html%20chars%20escape_1.xml
+```
 
 ## Misc
 
