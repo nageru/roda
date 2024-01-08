@@ -10,19 +10,14 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -59,10 +54,10 @@ import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Useful methods
@@ -126,7 +121,7 @@ public class HistoryUtils {
     return decodeList(Arrays.asList(hash.split(HISTORY_SEP_REGEX)));
   }
 
-  public static String createHistoryToken(List<String> tokens) {
+  private static String appendTokens(List<String> tokens, Function<String, String> encoder) {
     StringBuilder builder = new StringBuilder();
     boolean first = true;
     for (String token : tokens) {
@@ -136,22 +131,50 @@ public class HistoryUtils {
         builder.append(HISTORY_SEP);
       }
 
-      String encodedToken = URL.encodeQueryString(token);
+      String encodedToken = encoder.apply(token);
       builder.append(encodedToken);
     }
     return builder.toString();
   }
 
+  private static String appendTokens(List<String> tokens) {
+    return appendTokens(tokens, token -> token);
+  }
+
+  /** appends the tokens as a link only for path strings!
+   * @see URL#encodePathSegment(String) (String)
+   * @param tokens
+   * @return */
+  private static String createPathToken(List<String> tokens) {
+    return appendTokens(tokens, URL::encodePathSegment);
+  }
+
+  /** appends the tokens as a link only for query strings!
+   * @see URL#encodeQueryString(String) that will convert any the space character into its escape short form, '+' rather than %20.
+   * @param tokens
+   * @return */
+  private static String createQueryToken(List<String> tokens) {
+    return appendTokens(tokens, URL::encodeQueryString);
+  }
+
+  /** {@link Window.Location#assign(String)} as hash '#' link for query strings!
+   * {@link #createQueryToken(List)}
+   * @param path */
   public static void newHistory(List<String> path) {
-    String hash = createHistoryToken(path);
+    String hash = createQueryToken(path);
     Window.Location.assign("#" + hash);
   }
 
+  /** {@link Window.Location#replace(String)} as hash '#' link for query strings!
+   * {@link #createQueryToken(List)}
+   * @param path */
   public static void replaceHistory(List<String> path) {
-    String hash = createHistoryToken(path);
+    String hash = createQueryToken(path);
     Window.Location.replace("#" + hash);
   }
 
+  /** {@link #newHistory(List)}
+   * @param resolver */
   public static void newHistory(HistoryResolver resolver) {
     newHistory(resolver.getHistoryPath());
   }
@@ -166,17 +189,29 @@ public class HistoryUtils {
     newHistory(path);
   }
 
-  public static String createHistoryHashLink(List<String> path) {
-    String hash = createHistoryToken(path);
+  /** builds as hash '#' link for path strings!
+   * @see URL#encodePathSegment(String) (String)
+   * @param path
+   * @return */
+  public static String createHashLink(List<String> path) {
+    String hash = createPathToken(path);
     return "#" + hash;
   }
 
-  public static String createHistoryHashLink(HistoryResolver resolver, String... extrapath) {
-    return createHistoryHashLink(getHistory(resolver, extrapath));
+  /** builds history {@link #getHistory(HistoryResolver, String...)} link always as a hash path {@link #createHashLink(List)}
+   * @param resolver
+   * @param extraPath
+   * @return  */
+  public static String createHistoryHashLink(HistoryResolver resolver, String... extraPath) {
+    return createHashLink(getHistory(resolver, extraPath));
   }
 
-  public static String createHistoryHashLink(HistoryResolver resolver, List<String> extrapath) {
-    return createHistoryHashLink(getHistory(resolver, extrapath));
+  /** @see #createHistoryHashLink(HistoryResolver, String...)
+   * @param resolver
+   * @param extraPath
+   * @return */
+  public static String createHistoryHashLink(HistoryResolver resolver, List<String> extraPath) {
+    return createHashLink(getHistory(resolver, extraPath));
   }
 
   public static List<String> getHistoryBrowse(String aipId) {
@@ -313,7 +348,7 @@ public class HistoryUtils {
       history.add(splittedFilter[2]);
     }
 
-    return createHistoryHashLink(history);
+    return createHashLink(history);
   }
 
   public static void resolve(final String objectClass, final String objectUUID) {

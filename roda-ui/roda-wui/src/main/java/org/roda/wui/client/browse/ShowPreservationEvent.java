@@ -10,11 +10,15 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.*;
+import com.google.gwt.safehtml.shared.*;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.*;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -39,38 +43,12 @@ import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
-import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.tools.*;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.safehtml.shared.UriUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luis Faria
@@ -575,7 +553,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectIntellectualEntity(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(iAIP.getId())));
+        HistoryUtils.createHashLink(HistoryUtils.getHistoryBrowse(iAIP.getId()))); // the path to the aip
       footer.add(link);
 
       link.addStyleName("btn");
@@ -623,7 +601,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(irep.getAipId(), irep.getId())));
+        HistoryUtils.createHashLink(HistoryUtils.getHistoryBrowse(irep.getAipId(), irep.getId())));  // the path to the representation
 
       link.addStyleName("btn");
 
@@ -728,8 +706,8 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(
-        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), filePath, ifile.getId())));
+      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHashLink(
+        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), filePath, ifile.getId())));  // the full path to the file
 
       link.addStyleName("btn");
       footer.add(link);

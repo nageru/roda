@@ -10,9 +10,16 @@
  */
 package org.roda.wui.client.ingest.process;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.*;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
@@ -28,24 +35,8 @@ import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Luis Faria
@@ -199,7 +190,7 @@ public class ShowJobReport extends Composite {
       }
 
       // sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
-      sourceObject.setHref(HistoryUtils.createHistoryHashLink(
+      sourceObject.setHref(HistoryUtils.createHashLink( // as a path link
         HistoryUtils.getHistoryUuidResolver(jobReport.getSourceObjectClass(), jobReport.getSourceObjectId())));
       sourceObjectLabel.setText(messages.jobReportSource(jobReport.getSourceObjectClass()));
     }
@@ -220,7 +211,7 @@ public class ShowJobReport extends Composite {
       }
 
       // outcomeObject.setTitle(jobReport.getSourceObjectOriginalName());
-      outcomeObject.setHref(HistoryUtils.createHistoryHashLink(
+      outcomeObject.setHref(HistoryUtils.createHashLink( // kept as a query link
         HistoryUtils.getHistoryUuidResolver(jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId())));
       outcomeObjectLabel.setText(messages.jobReportOutcome(jobReport.getOutcomeObjectClass()));
       outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));

@@ -10,14 +10,16 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.*;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
@@ -56,24 +58,8 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author Luis Faria
@@ -511,12 +497,12 @@ public class ShowRepresentationInformation extends Composite {
 
       if (relation.getObjectType().equals(RelationObjectType.AIP)) {
         anchor = new Anchor(title,
-          HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
+          HistoryUtils.createHashLink(HistoryUtils.getHistoryBrowse(relation.getLink()))); // uses a path link to the aip
       } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
         List<String> history = new ArrayList<>();
         history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
         history.add(relation.getLink());
-        anchor = new Anchor(title, HistoryUtils.createHistoryHashLink(history));
+        anchor = new Anchor(title, HistoryUtils.createHashLink(history)); // uses a path link to the representation
       } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
         anchor = new Anchor(title, relation.getLink());
         anchor.getElement().setAttribute("target", "_blank");

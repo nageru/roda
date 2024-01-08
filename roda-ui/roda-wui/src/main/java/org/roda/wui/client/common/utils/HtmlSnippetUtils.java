@@ -7,33 +7,28 @@
  */
 package org.roda.wui.client.common.utils;
 
-import java.util.List;
-import java.util.Set;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.json.client.*;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.ui.*;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.disposal.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
-import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -57,25 +52,8 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
-import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.UIObject;
-
-import config.i18n.client.ClientMessages;
+import java.util.List;
+import java.util.Set;
 
 public class HtmlSnippetUtils {
 
@@ -493,17 +471,17 @@ public class HtmlSnippetUtils {
     final Anchor objectLink) {
     if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showAIPExtended());
-      objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER, incidence.getAipId()));
+      objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER, incidence.getAipId()));  // uses as a path link from the aip
       objectLink.setText(incidence.getAipId());
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showRepresentationExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, incidence.getAipId(),
-        incidence.getRepresentationId()));
+        incidence.getRepresentationId()));  // uses as a path link to the representation
       objectLink.setText(incidence.getRepresentationId());
     } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showFileExtended());
-      objectLink.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(incidence.getAipId(),
-        incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId())));
+      objectLink.setHref(HistoryUtils.createHashLink(HistoryUtils.getHistoryBrowse(incidence.getAipId(),
+        incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId())));  // uses as a path link to the file
       objectLink.setText(incidence.getFileId());
     }
   }

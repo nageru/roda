@@ -7,14 +7,18 @@
  */
 package org.roda.wui.client.common.slider;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -23,7 +27,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -33,30 +36,10 @@ import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.tools.*;
 
-import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
-import config.i18n.client.ClientMessages;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class InfoSliderHelper {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -445,18 +428,17 @@ public class InfoSliderHelper {
 
     addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), file.getInstanceId());
 
-    List<String> history = new ArrayList<>();
-    history.add(file.getAipId());
-    history.add(file.getRepresentationId());
-    history.addAll(file.getPath());
-    history.add(file.getId());
-
     Long preservationEventCount = bundle.getPreservationEventCount();
     Long riskIncidenceCount = bundle.getRiskIncidenceCount();
 
     if (riskIncidenceCount >= 0) {
+      final List<String> history = new ArrayList<>();
+      history.add(file.getAipId());
+      history.add(file.getRepresentationId());
+      history.addAll(file.getPath());
+      history.add(file.getId());
       Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
-        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
+        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history)); // history build as a path to the file id
       values.put(messages.preservationRisks(), risksLink);
     }
 

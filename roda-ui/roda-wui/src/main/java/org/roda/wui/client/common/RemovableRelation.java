@@ -7,15 +7,6 @@
  */
 package org.roda.wui.client.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.roda.core.data.v2.ri.RelationObjectType;
-import org.roda.core.data.v2.ri.RepresentationInformationRelation;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.StringUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -25,12 +16,15 @@ import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
+import org.roda.core.data.v2.ri.RelationObjectType;
+import org.roda.core.data.v2.ri.RepresentationInformationRelation;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemovableRelation extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -66,14 +60,14 @@ public class RemovableRelation extends Composite implements HasHandlers {
 
     if (riRelation.getObjectType().equals(RelationObjectType.AIP)) {
       Anchor a = new Anchor(title,
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(riRelation.getLink())), "_blank");
+        HistoryUtils.createHashLink(HistoryUtils.getHistoryBrowse(riRelation.getLink())), "_blank"); // as a query path
       link.add(a);
     } else if (riRelation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
       List<String> history = new ArrayList<>();
       history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
       history.add(riRelation.getLink());
 
-      Anchor a = new Anchor(title, HistoryUtils.createHistoryHashLink(history), "_blank");
+      Anchor a = new Anchor(title, HistoryUtils.createHashLink(history), "_blank"); // as a query path
       link.add(a);
     } else if (riRelation.getObjectType().equals(RelationObjectType.WEB)) {
       link.add(new Anchor(title, riRelation.getLink(), "_blank"));
