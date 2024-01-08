@@ -7,17 +7,6 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.FindRequest;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
-
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
@@ -31,6 +20,16 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.RootPanel;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RestUtils {
 
@@ -285,13 +284,31 @@ public class RestUtils {
     return createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, null);
   }
 
+  /** maps the tokens as a link only for path strings!
+   * @see URL#encodePathSegment(String) (String)
+   * @param token
+   * @return */
+  private static String mapPathToken(String token) {
+    return URL.encodePathSegment(token);
+
+  }
+
+  /** maps the token as a link only for query strings!
+   * @see URL#encodeQueryString(String) that will convert any the space character into its escape short form, '+' rather than %20.
+   * @param token
+   * @return */
+  private static String mapQueryToken(String token) {
+    return URL.encodeQueryString(token);
+  }
+
+
   public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String aipId, String representationId,
     String descId, String versionId) {
     // api/v1/representations/{aip_id}/{representation_id}/descriptive_metadata/{descId}?acceptFormat=html&version_id={versionId}
-    StringBuilder b = new StringBuilder();
+    final StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(mapPathToken(aipId))
+      .append(RodaConstants.API_SEP).append(mapPathToken(representationId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
 
     // accept format attribute
