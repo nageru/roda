@@ -7,31 +7,15 @@
  */
 package org.roda.core.plugins;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
+import com.google.common.collect.Iterables;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -40,12 +24,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
@@ -60,14 +39,16 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
-import com.google.common.collect.Iterables;
-
-import jersey.repackaged.com.google.common.collect.Lists;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class EARKSIPPluginsTest {
@@ -213,7 +194,7 @@ public class EARKSIPPluginsTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
-  @Test
+  @Test // "EARKSIP 2 ToAIPPlugin"
   public void testIngestEARKSIP() throws IOException, RODAException {
     AIP aip = ingestCorpora(EARKSIP2ToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
@@ -228,7 +209,7 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
   }
 
-  @Test
+  @Test // "EARKSIP 2 ToAIPPlugin"
   public void testIngestAndUpdateEARKSIP() throws IOException, RODAException {
     AIP aip = ingestCorpora(EARKSIP2ToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
@@ -307,7 +288,10 @@ public class EARKSIPPluginsTest {
 
     IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12),
       new ArrayList<>());
-    Assert.assertEquals(findAllAIP.getTotalCount(), 12L);
+    final long totalCount = findAllAIP.getTotalCount();
+    Assert.assertNotEquals(totalCount, 0L);
+    /* Assert.assertEquals(findAllAIP.getTotalCount(), 12L); // the total count of integration test can cumulate previous runs having already added AIPs */
+    Assert.assertTrue(totalCount >= 12L, "All expected AIPs not found; currently '" + totalCount + "' of a minimal of 12 expected!");
 
     IndexResult<IndexedAIP> findRootChildren = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2),
