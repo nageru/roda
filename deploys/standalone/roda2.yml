@@ -26,7 +26,7 @@ services:
     volumes:
       - solr2_data:/var/solr
   roda2:
-    image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
+    image: ghcr.io/nageru/roda:5.2.1-SNAPSHOT
     container_name: roda-upc
     restart: unless-stopped
     ports:
