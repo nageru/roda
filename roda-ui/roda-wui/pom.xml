@@ -166,7 +166,7 @@
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
-                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens=java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -218,7 +218,7 @@
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
-                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens=java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -269,7 +269,7 @@
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens=java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -286,7 +286,7 @@
                             <draftCompile>true</draftCompile>
                             <style>PRETTY</style>
                             <jvmArgs>
-                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens=java.base/java.util=ALL-UNNAMED
                             </jvmArgs>
                         </configuration>
                         <executions>
