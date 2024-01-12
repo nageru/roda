@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: roda-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10000000m"
+    nginx.org/client-max-body-size: "10000000m"
+    nginx.org/proxy_busy_buffers_size:  "512k"
+    nginx.org/proxy_buffers: "4 512k"
+    nginx.org/proxy_buffer_size: "256k"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      client_body_temp_path /tmp/big-client-bodies 1 2;
+    cert-manager.io/cluster-issuer: "letsencrypt-dev"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: roda.menton.nageru.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+               name: roda
+               port:
+                  number: 8080
