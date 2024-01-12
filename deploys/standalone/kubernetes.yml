@@ -1,0 +1,596 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: roda-udl
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: zookeeper-data-<namespace>
+   labels:
+     name: zookeeper-data-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/zookeeper-data
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: zookeeper-datalog-<namespace>
+   labels:
+     name: zookeeper-datalog-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/zookeeper-datalog
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: solr-data-<namespace>
+   labels:
+     name: solr-data-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/solr-data
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: clam-data-<namespace>
+   labels:
+     name: clam-data-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/clam-data
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: siegfried-data-<namespace>
+   labels:
+     name: siegfried-data-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/siegfried-data
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: roda-data-<namespace>
+   labels:
+     name: roda-data-<namespace>
+spec:
+   capacity:
+      storage: 10Gi
+   accessModes:
+      - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: local-storage
+   local:
+      path: /mnt/data/roda/<namespace>/roda-data
+#   nodeAffinity:
+#      required:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: kubernetes.io/hostname
+#            operator: In
+#            values:
+#            - <node-name>
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: zookeeper-data
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: zookeeper-data-<namespace>
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: zookeeper-datalog
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: zookeeper-datalog-<namespace>
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: solr-data
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: solr-data-<namespace>
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: clam-data
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: clam-data-<namespace>
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: siegfried-data
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: siegfried-data-<namespace>
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: roda
+  name: roda-data
+  namespace: <namespace>
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      name: roda-data-<namespace>
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: zookeeper
+    app: roda
+  name: zookeeper
+  namespace: <namespace>
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: zookeeper
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: zookeeper
+    spec:
+            #affinity:
+            #nodeAffinity:
+            #requiredDuringSchedulingIgnoredDuringExecution:
+            #nodeSelectorTerms:
+            #- matchExpressions:
+            #- key: kubernetes.io/hostname
+            #operator: In
+            #values:
+            #- <nodename>
+      containers:
+      - env:
+        - name: ZOO_4LW_COMMANDS_WHITELIST
+          value: mntr,conf,ruok
+        image: docker.io/zookeeper:3.8
+        imagePullPolicy: IfNotPresent
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+        resources:
+          limits:
+            memory: "2Gi"
+          requests:
+            memory: "100Mi"
+        volumeMounts:
+          - mountPath: /data
+            name: zookeeper-data
+          - mountPath: /datalog
+            name: zookeeper-datalog
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: github-registry-key
+      volumes:
+        - name: zookeeper-data
+          persistentVolumeClaim:
+            claimName: zookeeper-data
+        - name: zookeeper-datalog
+          persistentVolumeClaim:
+            claimName: zookeeper-datalog
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: solr
+    app: roda
+  name: solr
+  namespace: <namespace>
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: solr
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: solr
+    spec:
+            #affinity:
+            #nodeAffinity:
+            #requiredDuringSchedulingIgnoredDuringExecution:
+            #nodeSelectorTerms:
+            #- matchExpressions:
+            #- key: kubernetes.io/hostname
+            #operator: In
+            #values:
+            #- <nodename>
+      containers:
+      - env:
+        - name: SOLR_HEAP
+          value: 8g
+        - name: ZK_HOST
+          value: zookeeper:2181
+        image: docker.io/solr:9
+        imagePullPolicy: IfNotPresent
+        name: solr
+        ports:
+        - containerPort: 8983
+        resources:
+          limits:
+            memory: "8Gi"
+          requests:
+            memory: "100Mi"
+        volumeMounts:
+          - mountPath: /var/solr
+            name: solr-data
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: github-registry-key
+      volumes:
+        - name: solr-data
+          persistentVolumeClaim:
+            claimName: solr-data
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: clam
+    app: roda
+  name: clam
+  namespace: <namespace>
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: clam
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: clam
+    spec:
+            #affinity:
+            #nodeAffinity:
+            #requiredDuringSchedulingIgnoredDuringExecution:
+            #nodeSelectorTerms:
+            #- matchExpressions:
+            #- key: kubernetes.io/hostname
+            #operator: In
+            #values:
+            #- <nodename>
+      containers:
+        image: docker.io/clamav/clamav:stable
+        imagePullPolicy: IfNotPresent
+        name: clam
+        ports:
+        - containerPort: 3310
+        resources:
+          limits:
+            memory: "4Gi"
+          requests:
+            memory: "100Mi"
+        volumeMounts:
+          - mountPath: /var/lib/clamav
+            name: clam-data
+          - mountPath: /roda/data
+            name: roda-data
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: github-registry-key
+      volumes:
+        - name: clam-data
+          persistentVolumeClaim:
+            claimName: clam-data
+        - name: roda-data
+          persistentVolumeClaim:
+            claimName: roda-data
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: siegfried
+    app: roda
+  name: siegfried
+  namespace: <namespace>
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: siegfried
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: siegfried
+    spec:
+            #affinity:
+            #nodeAffinity:
+            #requiredDuringSchedulingIgnoredDuringExecution:
+            #nodeSelectorTerms:
+            #- matchExpressions:
+            #- key: kubernetes.io/hostname
+            #operator: In
+            #values:
+            #- <nodename>
+      containers:
+      - env:
+        - name: SIEGFRIED_HOST
+          value: 0.0.0.0
+        - name: SIEGFRIED_PORT
+          value: "5138"
+        image: ghcr.io/keeps/siegfried:v1.10.0
+        imagePullPolicy: IfNotPresent
+        name: siegfried
+        ports:
+        - containerPort: 5138
+        resources:
+          limits:
+            memory: "2Gi"
+          requests:
+            memory: "100Mi"
+        volumeMounts:
+          - mountPath: /root/siegfried
+            name: siegfried-data
+          - mountPath: /roda/data
+            name: roda-data
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: github-registry-key
+      volumes:
+        - name: siegfried-data
+          persistentVolumeClaim:
+            claimName: siegfried-data
+        - name: roda-data
+          persistentVolumeClaim:
+            claimName: roda-data
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: roda
+    app: roda
+  name: roda
+  namespace: <namespace>
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      service: roda
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: roda
+    spec:
+            #affinity:
+            #nodeAffinity:
+            #requiredDuringSchedulingIgnoredDuringExecution:
+            #nodeSelectorTerms:
+            #- matchExpressions:
+            #- key: kubernetes.io/hostname
+            #operator: In
+            #values:
+            #- <nodename>
+      containers:
+      - env:
+        - name: RODA_CORE_SOLR_TYPE
+          value: CLOUD
+        - name: RODA_CORE_SOLR_CLOUD_URLS
+          value: zookeeper:2181
+        - name: SOLR_NUM_SHARDS
+          value: "4"
+        - name: SOLR_REPLICATION_FACTOR
+          value: "1"
+        - name: SIEGFRIED_SERVER_URL
+          value: http://siegfried:5138
+        - name: CLAMD_TCPADDR
+          value: clam
+        - name: CLAMD_TCPSOCKET
+          value: "3310"
+        image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: roda
+        ports:
+        - containerPort: 8080
+        - containerPort: 8009
+        resources:
+          limits:
+            memory: "4Gi"
+          requests:
+            memory: "100Mi"
+        volumeMounts:
+          - mountPath: /roda/data
+            name: roda-data
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: github-registry-key
+      volumes:
+        - name: roda-data
+          persistentVolumeClaim:
+            claimName: roda-data
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  creationTimestamp: null
+  labels:
+    service: roda
+    app: roda
+  name: roda
+spec:
+  type: ClusterIP
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  - name: "8009"
+    port: 8009
+    targetPort: 8009
+  selector:
+    service: roda
+status:
+  loadBalancer: {}
+
+
