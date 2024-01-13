@@ -19,7 +19,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: roda.menton.nageru.com
+  - host: <host-name>
     http:
       paths:
         - path: /
