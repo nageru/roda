@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: roda-ingress
+  namespace: <namespace>
   annotations:
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
@@ -13,8 +14,6 @@ metadata:
     nginx.org/proxy_buffers: "4 512k"
     nginx.org/proxy_buffer_size: "256k"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/server-snippet: |
-      client_body_temp_path /tmp/big-client-bodies 1 2;
     cert-manager.io/cluster-issuer: "letsencrypt-dev"
 spec:
   ingressClassName: nginx
