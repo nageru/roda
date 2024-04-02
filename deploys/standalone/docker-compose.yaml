@@ -54,6 +54,7 @@ services:
     image: ghcr.io/nageru/roda:5.1.0-SNAPSHOT
     restart: unless-stopped
     container_name: roda-udl
+    user: root
     ports:
       - "8080:8080"
       - "8009:8009"

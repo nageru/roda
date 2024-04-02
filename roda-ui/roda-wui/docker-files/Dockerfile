@@ -4,7 +4,7 @@ LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 # Install dependencies
 RUN set -ex; \
     apt-get -qq update && \
-    apt-get -qq -y install software-properties-common; \
+    apt-get -qq -y install software-properties-common vim vim-common vim-runtime vim-tiny; \
     apt-get -qq -y --no-install-recommends install clamdscan zip rsync jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
