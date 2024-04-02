@@ -144,12 +144,11 @@ public class IArxiuToAIPPluginTest {
     final String aipId = verifyIngestedAip(aip);
 
     final  List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
-    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList,
-            "DC", "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient");
+    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList, "dc_SimpleDC20021212", "iArxiu-exp");
     Assert.assertEquals(2, descriptiveMetadataList.size());
 
     final List<Representation> representations = aip.getRepresentations();
-    verifyIngestedRepresentations(aipId, representations, "DC", "urn:iarxiu:2.0:vocabularies:cesca:Voc_document_exp");
+    verifyIngestedRepresentations(aipId, representations, "dc_SimpleDC20021212", "iArxiu-doc");
     Assert.assertEquals(1, representations.size());
 
     verifyIngestedOtherFiles(aipId, 0); // does the search and verifies none (all used types are known)
@@ -161,12 +160,11 @@ public class IArxiuToAIPPluginTest {
     final String aipId = verifyIngestedAip(aip);
 
     final  List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
-    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList,
-            "urn:iarxiu:2.0:vocabularies:cesca:Voc_expedient", "urn:iarxiu:2.0:vocabularies:cesca:Voc_UPF");
+    verifyIngestedDescriptiveMetadata(aipId, descriptiveMetadataList, "iArxiu-exp", "iArxiu-doc");
     Assert.assertEquals(2, descriptiveMetadataList.size());
 
     final List<Representation> representations = aip.getRepresentations();
-    verifyIngestedRepresentations(aipId, representations, "urn:iarxiu:2.0:vocabularies:cesca:Voc_document_exp");
+    verifyIngestedRepresentations(aipId, representations, "iArxiu-doc");
     Assert.assertEquals(4, representations.size());
 
     verifyIngestedOtherFiles(aipId, 0); // does the search and verifies none (all used types are known)
