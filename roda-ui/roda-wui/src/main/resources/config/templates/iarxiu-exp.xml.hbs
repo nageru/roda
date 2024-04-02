@@ -2,7 +2,7 @@
 {{~field name="numero_expedient" 	label="{\"en\": \"Record No.\",\"ca\": \"Número Expedient\"}" type="text" }}
 {{~field name="codi_classificacio" 	label="{\"en\": \"Classification Code\",\"ca\": \"Codi Classificació\"}" type="text" }}
 {{~field name="titol_serie_documental" 	label="{\"en\": \"Serie Title\",\"ca\": \"Títol Serie Documental\"}" type="text" }}
-{{~field name="titol" 	label="{\"en\": \"Title\",\"ca\": \"Títol\"}" type="text" }}
+{{~field name="title" 	label="{\"en\": \"Title\",\"ca\": \"Títol\"}" type="text" }}
 {{~field name="data_obertura" 	type="date" label="{\"en\": \"Opening Date\",\"ca\": \"Data Obertura\"}" auto-generate="now" xpath="//*:field[@name='data_obertura']/string()"~}}
 {{~field name="data_tancament" 	type="date" label="{\"en\": \"Closure Date\",\"ca\": \"Data tancament\"}" auto-generate="now" xpath="//*:field[@name='data_tancament']/string()"~}}
 {{~field name="nivell_descripcio" 	label="{\"en\": \"Description Level\",\"ca\": \"Nivell Descripció\"}" type="text" value="Unitat documental composta"}}
@@ -21,7 +21,7 @@
 	<field name="codi_classificacio">{{codi_classificacio}}</field>
 	<field name="titol_serie_documental">{{titol_serie_documental}}</field>
 	<field name="numero_expedient">{{numero_expedient}}</field>
-	<field name="titol">{{titol}}</field>
+	<field name="title">{{titol}}</field>
 	<field name="data_obertura">{{data_obertura}}</field>
 	<field name="data_tancament">{{data_tancament}}</field>
 	<field name="nivell_descripcio">{{nivell_descripcio}}</field>
