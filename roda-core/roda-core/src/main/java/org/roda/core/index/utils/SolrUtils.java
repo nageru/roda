@@ -1236,6 +1236,7 @@ public class SolrUtils {
         if (solrDocument != null) {
           Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
             LOGGER.error("Error adding document to index", e.getException());
+            LOGGER.error(e.toString());
           }).run(() -> {
             index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument);
           });
