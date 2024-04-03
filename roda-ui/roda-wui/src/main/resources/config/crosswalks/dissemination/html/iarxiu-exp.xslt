@@ -17,8 +17,9 @@
     <xsl:param name="i18n.nom_productor"/>
     <xsl:param name="i18n.unitat_productora"/>
     <xsl:param name="i18n.descripcio"/>
+    <xsl:param name="i18n.descriptors"/>
     <xsl:param name="i18n.classificacio_seguretat_acces"/>
-    <xsl:param name="i18n.sensibilitat_dades_LOPD"/>
+    <xsl:param name="i18n.sensibilitat_dades_lopd"/>
     
     <xsl:template match="/">
         <div class="descriptiveMetadata">
@@ -282,7 +283,7 @@
             <xsl:if test="normalize-space($joinedText) != ''">
                 <div class="field">
                     <div class="label">
-                        <xsl:value-of select="$i18n.sensibilitat_dades_LOPD"/>
+                        <xsl:value-of select="$i18n.sensibilitat_dades_lopd"/>
                     </div>
                     <xsl:for-each select="voc:sensibilitat_dades_LOPD">
                         <div class="value">
